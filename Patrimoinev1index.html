@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Patrimoine">
+<meta name="theme-color" content="#0a0a0b">
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
+<link rel="icon" href="data:image/png;base64,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">
+<title>Patrimoine</title>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#0a0a0b;--card:#161617;--card2:#232325;--line:rgba(255,255,255,.07);
+  --text:#f2f2ef;--text2:#a3a39c;--muted:#75756f;
+  --accent:#8fd16a;
+  --good:#0ca30c;--bad:#d03b3b;--warn:#fab219;--serious:#ec835a;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text)}
+body{font:15px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,system-ui,sans-serif;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;overscroll-behavior-y:none;-webkit-user-select:none;user-select:none}
+input,select,textarea{-webkit-user-select:text;user-select:text}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+b{font-weight:650}
+.top{position:sticky;top:0;z-index:5;display:flex;align-items:flex-end;justify-content:space-between;padding:calc(env(safe-area-inset-top) + 14px) 20px 12px;background:linear-gradient(var(--bg) 75%,rgba(10,10,11,0));max-width:640px;margin:0 auto}
+.hello{font-size:13px;color:var(--text2)}
+h1{margin:2px 0 0;font-size:31px;letter-spacing:-.025em;font-weight:760}
+.icon-btn{width:40px;height:40px;border-radius:50%;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;color:var(--text2)}
+#view{padding:2px 16px calc(104px + env(safe-area-inset-bottom));max-width:640px;margin:0 auto;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;margin-bottom:12px;position:relative}
+.label{font-size:11.5px;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;font-weight:650}
+.big{font-size:40px;font-weight:760;letter-spacing:-.035em;line-height:1.1;margin:6px 0 10px}
+.mid{font-size:26px;font-weight:740;letter-spacing:-.03em;margin:4px 0 6px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;font-size:13px;font-weight:650;background:var(--card2)}
+.up{color:var(--good)}.down{color:var(--bad)}
+.muted{color:var(--text2)}.faint{color:var(--muted)}.small{font-size:13px}.tiny{font-size:12px}
+.sec{display:flex;justify-content:space-between;align-items:baseline;margin:26px 4px 10px}
+.sec h2{margin:0;font-size:20px;letter-spacing:-.015em;font-weight:720}
+.link{color:var(--accent);font-weight:650;font-size:14px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.right{text-align:right;white-space:nowrap}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px 15px;min-width:0}
+.tile .v{font-size:21px;font-weight:720;letter-spacing:-.02em;margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile .s{font-size:12px;color:var(--text2);margin-top:2px}
+.split{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;font-size:13px;color:var(--text2)}
+.split b{color:var(--text);margin-left:4px}
+.sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.seg{display:inline-flex;background:var(--card2);border-radius:10px;padding:3px}
+.seg button{white-space:nowrap;padding:5px 11px;border-radius:8px;font-size:13px;font-weight:650;color:var(--text2)}
+.seg button.on{background:#3b3b3e;color:var(--text)}
+.chart{position:relative;margin-top:12px;touch-action:pan-y;min-height:40px}
+.chart svg{display:block;overflow:visible}
+svg text{fill:var(--muted);font-size:10.5px;font-family:inherit}
+.tip{position:absolute;top:0;left:0;pointer-events:none;background:#2c2c2f;border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:7px 10px;font-size:12px;line-height:1.35;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.45);opacity:0;transition:opacity .12s;z-index:3;color:var(--text2)}
+.tip b{color:var(--text);font-size:13.5px}
+.tip .k{display:flex;align-items:center;gap:6px}
+.empty-chart{border:1px dashed rgba(255,255,255,.12);border-radius:16px;padding:18px;text-align:center;color:var(--text2);font-size:13px;line-height:1.5}
+.empty-chart svg{margin:0 auto 8px;display:block}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;height:50px;border-radius:15px;background:var(--accent);color:#0a0a0b;font-weight:720;font-size:16px;width:100%}
+.btn.ghost{background:var(--card2);color:var(--text)}
+.btn.danger{background:rgba(208,59,59,.15);color:#ff8a8a}
+.btn.sm{height:40px;font-size:14px;border-radius:12px}
+.btns{display:flex;gap:10px}
+.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.act{display:flex;flex-direction:column;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:13px 4px 11px;font-size:12px;font-weight:650;color:var(--text2)}
+.act svg{color:var(--accent)}
+.act:active,.card[data-act]:active,.tile[data-act]:active{transform:scale(.98);transition:transform .1s}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;justify-content:space-around;padding:8px 8px calc(6px + env(safe-area-inset-bottom));background:rgba(17,17,18,.84);backdrop-filter:blur(22px) saturate(1.4);-webkit-backdrop-filter:blur(22px) saturate(1.4);border-top:1px solid var(--line)}
+.tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;font-weight:650;color:var(--muted);padding:4px 0}
+.tabbar button.on{color:var(--accent)}
+.name{font-weight:700;font-size:16px;letter-spacing:-.01em}
+.tick{font-size:12px;color:var(--muted);margin-left:7px;font-weight:550}
+.lv{font-weight:720;font-size:17px;letter-spacing:-.01em}
+.spark{width:100%;height:36px;display:block;margin:10px 0 2px}
+.spark-empty{font-size:12px;color:var(--muted);margin:10px 0 2px;height:36px;display:flex;align-items:center}
+.track{position:relative;height:8px;background:var(--card2);border-radius:4px;margin:12px 0 8px}
+.fill{position:absolute;left:0;top:0;bottom:0;background:var(--accent);border-radius:4px}
+.target{position:absolute;top:-5px;bottom:-5px;width:3px;margin-left:-1.5px;background:var(--text);border-radius:2px;box-shadow:0 0 0 2px var(--card)}
+.status{white-space:nowrap;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:650;color:var(--text2)}
+.status i{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
+.legend{margin-top:14px}
+.lg{display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;padding:9px 2px;border-top:1px solid var(--line);font-size:14px}
+.lg:first-child{border-top:0}
+.lg .p{color:var(--text2);font-size:13px;min-width:48px;text-align:right}
+.lg .vv{font-weight:650;min-width:84px;text-align:right}
+.donut-wrap{position:relative;width:176px;height:176px;margin:4px auto 0}
+.dc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;text-align:center;padding:0 40px}
+.dc .a{font-size:12px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.dc .b{font-size:19px;font-weight:740;letter-spacing:-.02em}
+.dc .c{font-size:12px;color:var(--text2)}
+.goal{display:flex;gap:16px;align-items:center}
+.goal .rw{position:relative;flex:none}
+.goal .rp{position:absolute;inset:0;display:grid;place-items:center;font-weight:740;font-size:17px}
+.ins{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-top:1px solid var(--line);font-size:14px;line-height:1.45;color:var(--text2)}
+.ins:first-child{border-top:0;padding-top:2px}
+.ins b{color:var(--text)}
+.ins .e{font-size:18px;line-height:1.2}
+.av{width:40px;height:40px;border-radius:13px;display:grid;place-items:center;font-weight:760;font-size:14px;flex:none}
+.rb-row{display:grid;grid-template-columns:1fr auto;gap:4px 10px;padding:11px 0;border-top:1px solid var(--line);align-items:center}
+.rb-row .n{font-weight:650}
+.rb-row .q{font-weight:720;text-align:right}
+.rb-tot{display:flex;justify-content:space-between;padding:12px 0 4px;border-top:1px solid rgba(255,255,255,.14);font-size:14px}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--text2);margin:12px 0}
+.check input{width:22px;height:22px;accent-color:var(--accent);flex:none;margin:0}
+.badges{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.badge{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px 4px 10px;text-align:center}
+.badge .e{font-size:26px;filter:grayscale(1);opacity:.28;line-height:1.2}
+.badge.on{border-color:rgba(143,209,106,.35);background:linear-gradient(180deg,rgba(143,209,106,.10),var(--card))}
+.badge.on .e{filter:none;opacity:1}
+.badge .t{font-size:11px;font-weight:650;margin-top:5px;color:var(--muted)}
+.badge.on .t{color:var(--text)}
+.flame{font-size:46px;line-height:1}
+.mv{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.mv:first-child{border-top:0}
+.del{width:30px;height:30px;border-radius:50%;background:var(--card2);color:var(--muted);font-size:14px}
+.note{font-size:12.5px;color:var(--muted);line-height:1.5;margin:6px 4px 0}
+.cta{border:1px dashed rgba(143,209,106,.4);background:rgba(143,209,106,.05);border-radius:20px;padding:18px;text-align:center;color:var(--text2);font-size:14px;margin-bottom:12px}
+.cta b{color:var(--accent)}
+.live{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--good);margin-right:7px;box-shadow:0 0 0 3px rgba(12,163,12,.2)}
+.live.off{background:var(--muted);box-shadow:none}
+.code{background:var(--card2);border-radius:12px;padding:10px 12px;font:13px/1.6 ui-monospace,Menlo,monospace;color:var(--text);overflow-x:auto;white-space:pre;margin:8px 0 10px;-webkit-user-select:text;user-select:text}
+.kv{display:flex;justify-content:space-between;padding:6px 0;font-size:14px;color:var(--text2)}
+.kv b{color:var(--text)}
+/* sheet */
+.sheet-wrap{position:fixed;inset:0;z-index:50}
+.sheet-wrap[hidden]{display:none}
+.backdrop{position:absolute;inset:0;background:rgba(0,0,0,.62);opacity:0;transition:opacity .25s}
+.panel{position:absolute;left:0;right:0;bottom:0;max-height:92vh;overflow:auto;background:#141415;border:1px solid var(--line);border-bottom:0;border-radius:26px 26px 0 0;padding:8px 18px calc(26px + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .3s cubic-bezier(.2,.85,.2,1);max-width:640px;margin:0 auto;-webkit-overflow-scrolling:touch}
+.open .backdrop{opacity:1}.open .panel{transform:none}
+.grab{width:40px;height:5px;border-radius:3px;background:#3a3a3d;margin:4px auto 12px}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.sheet-head h3{margin:0;font-size:21px;letter-spacing:-.015em}
+.field{display:block;margin-bottom:12px}
+.field>span{display:block;font-size:13px;color:var(--text2);margin:0 4px 6px}
+.field input,.field select{width:100%;height:50px;border-radius:14px;border:1px solid transparent;background:var(--card2);color:var(--text);font-size:17px;padding:0 14px;outline:none;-webkit-appearance:none;appearance:none;font-family:inherit}
+.field input:focus,.field select:focus{border-color:var(--accent)}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hr{height:1px;background:var(--line);margin:18px 0}
+.sh-sub{font-size:13px;font-weight:700;color:var(--text2);letter-spacing:.05em;text-transform:uppercase;margin:18px 4px 10px}
+.pr-row{display:grid;grid-template-columns:1fr 128px;gap:10px;align-items:center;margin-bottom:8px}
+.pr-row input{height:46px;border-radius:12px;border:1px solid transparent;background:var(--card2);color:var(--text);font-size:17px;padding:0 12px;outline:none;width:100%;text-align:right;font-family:inherit}
+.pr-row input:focus{border-color:var(--accent)}
+.steps{margin:0;padding-left:20px;color:var(--text2);line-height:1.6;font-size:15px}
+.steps b{color:var(--text)}
+#toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));transform:translate(-50%,16px);background:#f2f2ef;color:#0a0a0b;font-weight:650;padding:10px 16px;border-radius:999px;opacity:0;transition:.25s;z-index:70;font-size:14px;pointer-events:none;max-width:88vw;text-align:center;white-space:nowrap}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<header class="top">
+  <div><div class="hello" id="hello"></div><h1 id="title">Accueil</h1></div>
+  <button class="icon-btn" data-act="settings" aria-label="Réglages">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  </button>
+</header>
+<main id="view"></main>
+<nav class="tabbar">
+  <button data-tab="home"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Accueil</button>
+  <button data-tab="pea"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 6-7"/></svg>PEA</button>
+  <button data-tab="save"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="3"/><path d="M3 10h18"/><path d="M7 3h10"/></svg>Épargne</button>
+  <button data-tab="track"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>Suivi</button>
+</nav>
+<div id="sheet" class="sheet-wrap" hidden></div>
+<div id="toast"></div>
+<input type="file" id="importFile" accept="application/json,.json" hidden>
+
+<script>
+'use strict';
+/* ---------- utilitaires ---------- */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const KEY='patrimoine.app.v1';
+const SERIES=['#3987e5','#d95926','#199e70','#c98500','#d55181','#0ca30c','#9085e9','#e66767'];
+const OTHER='#6c6c66';
+const z=n=>String(n).padStart(2,'0');
+const iso=(d=new Date())=>`${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}`;
+const mk=(d=new Date())=>`${d.getFullYear()}-${z(d.getMonth()+1)}`;
+const uid=()=>Math.random().toString(36).slice(2,10);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num=s=>{const v=parseFloat(String(s??'').replace(/[\s  €%]/g,'').replace(',','.'));return isFinite(v)?v:0};
+const r2=v=>Math.round(v*100)/100;
+const NF2=new Intl.NumberFormat('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const NF0=new Intl.NumberFormat('fr-FR',{maximumFractionDigits:0});
+const NF1=new Intl.NumberFormat('fr-FR',{minimumFractionDigits:1,maximumFractionDigits:1});
+const NFq=new Intl.NumberFormat('fr-FR',{maximumFractionDigits:4});
+const eur=(v,d)=>{d=d??(Math.abs(v)>=10000?0:2);return (d?NF2:NF0).format(d?v:Math.round(v))+' €'};
+const sgn=v=>v>0?'+':v<0?'−':'';
+const eurS=(v,d)=>sgn(r2(v))+eur(Math.abs(v),d);
+const pct=(v,d=1)=>(d?NF1:NF0).format(v*100)+' %';
+const pctS=v=>sgn(Math.round(v*1000)/1000)+pct(Math.abs(v));
+const pts=v=>sgn(Math.round(v*1000)/1000)+NF1.format(Math.abs(v*100))+' pt';
+const short=v=>{const a=Math.abs(v);if(a>=1e6)return NF1.format(v/1e6)+' M';if(a>=1e3)return (a>=1e4?NF0.format(v/1e3):NF1.format(v/1e3)).replace(',0','')+' k';return NF0.format(v)};
+const MONTHS=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+const MONTHS_L=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+const mLabel=m=>{const [y,mo]=m.split('-');return MONTHS[+mo-1]+' '+y.slice(2)};
+const dLabel=d=>{const [y,m,dd]=d.split('-');return `${+dd} ${MONTHS[+m-1]} ${y}`};
+const monthsBetween=(a,b)=>(b.getFullYear()-a.getFullYear())*12+(b.getMonth()-a.getMonth());
+const ageTxt=m=>{const y=Math.floor(m/12),r=m%12;return [y?`${y} an${y>1?'s':''}`:'',r?`${r} mois`:''].filter(Boolean).join(' ')||'moins d’un mois'};
+
+/* ---------- cours automatiques (onglet Google Sheets publié en CSV) ---------- */
+const normT=t=>String(t||'').trim().toUpperCase().split(':').pop().trim();
+const sheetT=t=>{t=String(t||'').trim().toUpperCase();return t.includes(':')?t:'EPA:'+t};
+function parsePrice(v){let x=String(v||'').replace(/[^\d,.\-]/g,'');if(!x)return 0;if(x.includes(',')&&x.includes('.')){x=x.lastIndexOf(',')>x.lastIndexOf('.')?x.replace(/\./g,'').replace(',','.'):x.replace(/,/g,'')}else x=x.replace(',','.');const n=parseFloat(x);return isFinite(n)?n:0}
+function parseCSV(t){const rows=[];let row=[],f='',q=false;for(let i=0;i<t.length;i++){const c=t[i];if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++}else q=false}else f+=c}else if(c==='"')q=true;else if(c===','){row.push(f);f=''}else if(c==='\n'||c==='\r'){if(c==='\r'&&t[i+1]==='\n')i++;row.push(f);rows.push(row);row=[];f=''}else f+=c}if(f!==''||row.length){row.push(f);rows.push(row)}return rows}
+let fetching=false;
+async function fetchPrices(manual){
+  const url=(S.settings&&S.settings.priceUrl||'').trim();
+  if(!url){if(manual)toast('Connecte d’abord ton Google Sheet');return null}
+  if(fetching)return null;fetching=true;
+  try{
+    const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('http '+r.status);
+    const txt=await r.text();if(/<html|<!doctype/i.test(txt.slice(0,300)))throw new Error('pas un CSV');
+    const map={};parseCSV(txt).forEach(row=>{if(row.length<2)return;const k=normT(row[0]),p=parsePrice(row[1]);if(k&&p>0)map[k]=p});
+    let n=0;const miss=[];
+    S.pea.lines.forEach(l=>{const p=map[normT(l.ticker)];if(p){l.price=p;recordPrice(l,p);n++}else miss.push(l.name)});
+    S.settings.lastFetch=Date.now();save();
+    if(manual)toast(n?`Cours mis à jour ✓ (${n}/${S.pea.lines.length})`:'Aucun ticker reconnu dans le Sheet');
+    return {n,miss,found:Object.keys(map).length};
+  }catch(e){if(manual)toast('Cours indisponibles : vérifie le lien ou ta connexion');return {error:String(e.message||e)}}
+  finally{fetching=false}
+}
+const fetchTxt=()=>{const t=S.settings&&S.settings.lastFetch;if(!t)return 'pas encore synchronisé';const d=new Date(t),now=new Date();const hm=`${z(d.getHours())}:${z(d.getMinutes())}`;return iso(d)===iso(now)?`mis à jour à ${hm}`:`mis à jour le ${dLabel(iso(d))} à ${hm}`};
+
+/* ---------- types de comptes (taux en vigueur au 15/11/2026) ---------- */
+const TYPES={
+  livretA:{label:'Livret A',group:'reg',rate:1.7,ceiling:22950},
+  ldds:{label:'LDDS',group:'reg',rate:1.7,ceiling:12000},
+  lep:{label:'LEP',group:'reg',rate:2.5,ceiling:10000},
+  jeune:{label:'Livret Jeune',group:'reg',rate:1.7,ceiling:1600},
+  cel:{label:'CEL',group:'reg',rate:1.25,ceiling:15300},
+  pel:{label:'PEL',group:'reg',rate:2,ceiling:61200},
+  livret:{label:'Livret bancaire',group:'reg',rate:0,ceiling:0},
+  av:{label:'Assurance vie',group:'inv',rate:0,ceiling:0},
+  per:{label:'PER',group:'inv',rate:0,ceiling:0},
+  cto:{label:'Compte-titres',group:'inv',rate:0,ceiling:0},
+  crypto:{label:'Crypto',group:'inv',rate:0,ceiling:0},
+  courant:{label:'Compte courant',group:'other',rate:0,ceiling:0},
+  pro:{label:'Compte pro',group:'other',rate:0,ceiling:0},
+  immo:{label:'Immobilier',group:'other',rate:0,ceiling:0},
+  autre:{label:'Autre',group:'other',rate:0,ceiling:0}
+};
+const initials=n=>{const w=String(n).split(/[\s\-]+/).map(x=>x.replace(/[^A-Za-zÀ-ÿ0-9]/g,'')).filter(Boolean);return ((w.length>1?w[0][0]+w[1][0]:(w[0]||'€').slice(0,2))).toUpperCase()};
+const GROUPS={reg:'Livrets',inv:'Placements',other:'Autres avoirs'};
+
+/* ---------- données ---------- */
+function seed(){
+  const t=iso(), m1=iso(new Date(Date.now()-31*864e5));
+    return {v:1,created:t,
+    profile:{goal:100000,goalDate:'2036-12-31',monthly:200,expenses:0},
+    pea:{openDate:'',depositsBase:0,cash:0,lines:[]},
+    accounts:[],moves:[],snaps:[],settings:{}};
+}
+let S;
+function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&o.pea&&o.accounts)return o}}catch(e){}return null}
+function save(){snapshot();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('Impossible d’enregistrer sur ce téléphone')}}
+
+/* ---------- calculs ---------- */
+const lineVal=l=>(+l.qty||0)*(+l.price||0);
+const linesValue=()=>S.pea.lines.reduce((a,l)=>a+lineVal(l),0);
+const peaValue=()=>linesValue()+(+S.pea.cash||0);
+const accTotal=f=>S.accounts.filter(f||(()=>true)).reduce((a,x)=>a+(+x.balance||0),0);
+const total=()=>peaValue()+accTotal();
+const peaDeposits=()=>(+S.pea.depositsBase||0)+S.moves.filter(m=>m.acc==='pea').reduce((a,m)=>a+m.amount,0);
+const tsum=()=>S.pea.lines.reduce((a,l)=>a+(+l.target||0),0);
+const tw=l=>{const t=tsum();return t>0?(+l.target||0)/t:1/Math.max(1,S.pea.lines.length)};
+const accType=a=>TYPES[a.type]||TYPES.autre;
+const interestYear=()=>S.accounts.reduce((a,x)=>a+(+x.balance||0)*(+x.rate||0)/100,0);
+const safetyMonths=()=>S.profile.expenses>0?accTotal(a=>accType(a).group==='reg')/S.profile.expenses:0;
+const monthIn=(m=mk())=>S.moves.filter(x=>x.amount>0&&x.d.slice(0,7)===m).reduce((a,x)=>a+x.amount,0);
+const peaAgeMonths=()=>{if(!S.pea.openDate)return -1;return Math.max(0,monthsBetween(new Date(S.pea.openDate),new Date()))};
+const goalProg=()=>S.profile.goal>0?Math.min(1,total()/S.profile.goal):0;
+function entityColor(id){if(id==='pea')return SERIES[0];const i=S.accounts.findIndex(a=>a.id===id);return i>=0&&i+1<=6?SERIES[i+1]:OTHER}
+function prevSnap(){const m=mk();return S.snaps.filter(s=>s.m<m).pop()}
+function snapshot(){const m=mk(),acc={};S.accounts.forEach(a=>acc[a.id]=+a.balance||0);const s={m,total:r2(total()),pea:r2(peaValue()),acc};const i=S.snaps.findIndex(x=>x.m===m);if(i>=0)S.snaps[i]=s;else S.snaps.push(s);S.snaps.sort((a,b)=>a.m<b.m?-1:1)}
+function streak(){const set=new Set(S.moves.filter(m=>m.amount>0).map(m=>m.d.slice(0,7)));const d=new Date();d.setDate(1);if(!set.has(mk(d)))d.setMonth(d.getMonth()-1);let n=0;while(set.has(mk(d))){n++;d.setMonth(d.getMonth()-1)}return n}
+function trend(l){const h=l.history||[];if(h.length<2)return null;const lim=iso(new Date(Date.now()-30*864e5));let ref=null;for(const p of h){if(p.d<=lim)ref=p}if(!ref)ref=h[0];if(ref===h[h.length-1]||!ref.p)return null;return l.price/ref.p-1}
+function recordPrice(l,p){l.history=l.history||[];const d=iso(),h=l.history;if(h.length&&h[h.length-1].d===d)h[h.length-1].p=p;else h.push({d,p});if(h.length>150)h.splice(0,h.length-150)}
+function peaBalanced(){const LV=linesValue();if(!LV||!S.pea.lines.length)return false;return S.pea.lines.every(l=>Math.abs(lineVal(l)/LV-tw(l))<=0.015)}
+function expectedRate(){const P=peaValue();let w=P,s=P*0.07;S.accounts.forEach(a=>{const b=+a.balance||0;w+=b;s+=b*(+a.rate||0)/100});return w>0?s/w:0.07}
+function fv(P,m,r,months){const i=Math.pow(1+r,1/12)-1;if(!i)return P+m*months;const g=Math.pow(1+i,months);return P*g+m*(g-1)/i}
+function needMonthly(G,P,r,n){if(n<=0)return null;const i=Math.pow(1+r,1/12)-1,g=Math.pow(1+i,n);const v=i?(G-P*g)*i/(g-1):(G-P)/n;return Math.max(0,v)}
+
+/* rééquilibrage sans vente : euros puis parts entières */
+function rebalancePlan(amount){
+  const L=S.pea.lines.filter(l=>l.price>0),V=linesValue(),N=V+amount;
+  const rows=L.map(l=>({l,t:tw(l),v:lineVal(l)}));
+  rows.forEach(r=>r.def=Math.max(0,r.t*N-r.v));
+  const D=rows.reduce((a,r)=>a+r.def,0);
+  rows.forEach(r=>{r.eur=D<=0?amount*r.t:(D>=amount?amount*r.def/D:r.def+(amount-D)*r.t);r.frac=r.eur/r.l.price;r.n=Math.floor(r.frac+1e-9)});
+  let left=amount-rows.reduce((a,r)=>a+r.n*r.l.price,0);
+  for(let k=0;k<500;k++){
+    let best=null,bd=0;
+    rows.forEach(r=>{if(r.l.price<=left+1e-9){const d=r.t*N-(r.v+r.n*r.l.price);if(d>bd){bd=d;best=r}}});
+    if(!best||bd<best.l.price*0.5)break;best.n++;left-=best.l.price;
+  }
+  const spent=rows.reduce((a,r)=>a+r.n*r.l.price,0);
+  return {rows,spent,left:amount-spent,amount};
+}
+
+/* ---------- graphiques (SVG maison) ---------- */
+function niceStep(range,count){if(range<=0)return 1;const raw=range/count,p=Math.pow(10,Math.floor(Math.log10(raw))),f=raw/p;return (f<1.5?1:f<3?2:f<7?5:10)*p}
+function lineChart(el,labels,series,o={}){
+  const W=Math.max(260,el.clientWidth||320),H=o.h||180,pl=o.pl??44,pr=o.pr??12,pt=14,pb=24;
+  const n=labels.length,all=series.flatMap(s=>s.values);
+  let mn=Math.min(...all),mx=Math.max(...all);
+  if(o.zero)mn=0;
+  if(mx===mn){mx=mx*1.1||1;if(!o.zero)mn=mn*0.9}
+  else if(!o.zero){const p=(mx-mn)*.18;mn=Math.max(0,mn-p);mx+=p*.5}
+  const st=niceStep(mx-mn,3);mn=Math.floor(mn/st)*st;mx=Math.ceil(mx/st)*st;
+  const iw=W-pl-pr,ih=H-pt-pb;
+  const X=i=>pl+(n<=1?iw/2:i*iw/(n-1)),Y=v=>pt+(1-(v-mn)/((mx-mn)||1))*ih;
+  let g='';
+  for(let v=mn;v<=mx+st/2;v+=st){const y=Y(v).toFixed(1);g+=`<line x1="${pl}" x2="${W-pr}" y1="${y}" y2="${y}" stroke="rgba(255,255,255,${v===mn?.12:.06})"/><text x="${pl-8}" y="${+y+3.5}" text-anchor="end">${short(v)}</text>`}
+  const k=Math.min(n,o.xticks||4);
+  for(let j=0;j<k;j++){const i=k===1?0:Math.round(j*(n-1)/(k-1));const anc=k>1&&j===0?'start':k>1&&j===k-1?'end':'middle';g+=`<text x="${X(i).toFixed(1)}" y="${H-5}" text-anchor="${anc}">${labels[i]}</text>`}
+  let body='';
+  series.forEach(s=>{
+    const d=s.values.map((v,i)=>`${i?'L':'M'}${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join('');
+    if(s.area){const gid='g'+uid();body+=`<defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${s.color}" stop-opacity=".30"/><stop offset="1" stop-color="${s.color}" stop-opacity="0"/></linearGradient></defs><path d="${d}L${X(n-1).toFixed(1)},${Y(mn).toFixed(1)}L${X(0).toFixed(1)},${Y(mn).toFixed(1)}Z" fill="url(#${gid})"/>`}
+    body+=`<path d="${d}" fill="none" stroke="${s.color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"${s.dash?' stroke-dasharray="4 5"':''}/>`;
+  });
+  if(o.endDot)series.forEach(s=>{if(!s.dash)body+=`<circle cx="${X(n-1).toFixed(1)}" cy="${Y(s.values[n-1]).toFixed(1)}" r="4.5" fill="${s.color}" stroke="#161617" stroke-width="2"/>`});
+  if(o.direct){const lab=series.map(s=>({s,y:Y(s.values[n-1])})).sort((a,b)=>a.y-b.y);for(let i=1;i<lab.length;i++)if(lab[i].y-lab[i-1].y<14)lab[i].y=lab[i-1].y+14;lab.forEach(l=>{body+=`<text x="${W-pr+8}" y="${(l.y+3.5).toFixed(1)}" style="fill:var(--text2);font-weight:650;font-size:11px">${l.s.name}</text>`})}
+  const hov=`<line class="xh" y1="${pt}" y2="${H-pb}" stroke="rgba(255,255,255,.35)" stroke-width="1" style="opacity:0"/>`+series.map((s,i)=>`<circle class="hd" r="5" fill="${s.color}" stroke="#161617" stroke-width="2" style="opacity:0"/>`).join('');
+  el.innerHTML=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.aria||'Graphique')}">${g}${body}${hov}<rect x="${pl-6}" y="0" width="${iw+12}" height="${H}" fill="transparent"/></svg><div class="tip"></div>`;
+  const svg=el.querySelector('svg'),tip=el.querySelector('.tip'),xh=svg.querySelector('.xh'),dots=$$('.hd',svg);
+  let tmr;
+  const show=cx=>{clearTimeout(tmr);const r=svg.getBoundingClientRect();let i=n<=1?0:Math.round((cx-r.left-pl)/iw*(n-1));i=Math.max(0,Math.min(n-1,i));const px=X(i);
+    xh.setAttribute('x1',px);xh.setAttribute('x2',px);xh.style.opacity=1;
+    dots.forEach((d,si)=>{d.setAttribute('cx',px);d.setAttribute('cy',Y(series[si].values[i]));d.style.opacity=1});
+    tip.innerHTML=o.tip(i);tip.style.opacity=1;const w=tip.offsetWidth;let left=px<W/2?px+12:px-12-w;left=Math.max(0,Math.min(W-w,left));tip.style.left=left+'px';tip.style.top='0px'};
+  const hide=()=>{xh.style.opacity=0;dots.forEach(d=>d.style.opacity=0);tip.style.opacity=0};
+  svg.addEventListener('pointerdown',e=>show(e.clientX));
+  svg.addEventListener('pointermove',e=>show(e.clientX));
+  svg.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')hide()});
+  svg.addEventListener('pointerup',e=>{if(e.pointerType!=='mouse'){tmr=setTimeout(hide,2200)}});
+  svg.addEventListener('pointercancel',hide);
+}
+function barPath(x,y,w,h,r){r=Math.min(r,w/2,h);return `M${x},${y+h}V${y+r}Q${x},${y} ${x+r},${y}H${x+w-r}Q${x+w},${y} ${x+w},${y+r}V${y+h}Z`}
+function barChart(el,items,o={}){
+  const W=Math.max(260,el.clientWidth||320),H=o.h||150,pl=40,pr=6,pt=12,pb=22,iw=W-pl-pr,ih=H-pt-pb,n=items.length;
+  let mx=Math.max(0,...items.map(d=>d.v));if(mx<=0)mx=100;const st=niceStep(mx,2);mx=Math.ceil(mx/st)*st;
+  const Y=v=>pt+ih-(v/mx)*ih,slot=iw/n,bw=Math.min(22,slot*.6);
+  let g='';for(let v=0;v<=mx+st/2;v+=st){const y=Y(v).toFixed(1);g+=`<line x1="${pl}" x2="${W-pr}" y1="${y}" y2="${y}" stroke="rgba(255,255,255,${v?0.06:.14})"/><text x="${pl-8}" y="${+y+3.5}" text-anchor="end">${short(v)}</text>`}
+  let b='';items.forEach((d,i)=>{const x=pl+i*slot+(slot-bw)/2,h=ih*d.v/mx;if(h>0.5)b+=`<path class="bar" data-i="${i}" d="${barPath(x,Y(d.v),bw,h,4)}" fill="${o.color||'var(--accent)'}" opacity="${d.cur?1:.62}"/>`;b+=`<text x="${(x+bw/2).toFixed(1)}" y="${H-5}" text-anchor="middle" ${d.cur?'style="fill:var(--text);font-weight:700"':''}>${d.l}</text><rect class="hitb" data-i="${i}" x="${pl+i*slot}" y="0" width="${slot}" height="${H}" fill="transparent"/>`});
+  el.innerHTML=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.aria||'Histogramme')}">${g}${b}</svg><div class="tip"></div>`;
+  const tip=el.querySelector('.tip');let tmr;
+  $$('.hitb',el).forEach(r=>r.addEventListener('pointerdown',()=>{clearTimeout(tmr);const i=+r.dataset.i,d=items[i];tip.innerHTML=o.tip(d);tip.style.opacity=1;const cx=pl+i*slot+slot/2,w=tip.offsetWidth;tip.style.left=Math.max(0,Math.min(W-w,cx-w/2))+'px';tip.style.top='-6px';$$('.bar',el).forEach(p=>p.setAttribute('opacity',+p.dataset.i===i?1:.35));tmr=setTimeout(()=>{tip.style.opacity=0;$$('.bar',el).forEach(p=>p.setAttribute('opacity',items[+p.dataset.i].cur?1:.62))},2200)}));
+}
+function arcPath(cx,cy,r0,r1,a0,a1){const P=(r,a)=>[(cx+r*Math.cos(a)).toFixed(2),(cy+r*Math.sin(a)).toFixed(2)];const lg=a1-a0>Math.PI?1:0;const [x0,y0]=P(r1,a0),[x1,y1]=P(r1,a1),[x2,y2]=P(r0,a1),[x3,y3]=P(r0,a0);return `M${x0},${y0}A${r1},${r1} 0 ${lg} 1 ${x1},${y1}L${x2},${y2}A${r0},${r0} 0 ${lg} 0 ${x3},${y3}Z`}
+function ring(p,size=92,sw=10){const r=(size-sw)/2,C=2*Math.PI*r,c=size/2;return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="var(--card2)" stroke-width="${sw}"/>${p>0?`<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="var(--accent)" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${(C*Math.min(1,p)).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 ${c} ${c})"/>`:''}</svg>`}
+function spark(vals,color){if(vals.length<2)return '<div class="spark-empty">La courbe se construit à chaque mise à jour du cours</div>';const w=100,h=32;let mn=Math.min(...vals),mx=Math.max(...vals);if(mx===mn){mx+=1;mn-=1}const X=i=>i*w/(vals.length-1),Y=v=>h-3-(v-mn)/(mx-mn)*(h-6);const d=vals.map((v,i)=>`${i?'L':'M'}${X(i).toFixed(2)},${Y(v).toFixed(2)}`).join('');return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><path d="${d}" fill="none" stroke="${color}" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/></svg>`}
+
+/* ---------- interface ---------- */
+const UI={tab:'home',range:'1A',horizon:20,projMonthly:null,rbAmount:null,donutSel:null,plan:null};
+let mounts=[];const mount=f=>mounts.push(f);
+const TITLES={home:'Accueil',pea:'Mon PEA',save:'Épargne',track:'Suivi'};
+const seg=(k,opts,cur)=>`<div class="seg">${opts.map(o=>`<button data-act="seg" data-k="${k}" data-v="${o}" class="${String(o)===String(cur)?'on':''}">${o}${k==='horizon'?' ans':''}</button>`).join('')}</div>`;
+const status=(gap)=>{const a=Math.abs(gap);if(a<=0.015)return `<span class="status"><i style="background:var(--good)"></i>Dans la cible</span>`;return `<span class="status"><i style="background:var(--serious)"></i>${gap>0?'↑ Trop':'↓ Manque'} ${pts(gap)}</span>`};
+const ICON={
+  check:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.2-8.6"/><path d="m9 11 3 3L22 4"/></svg>',
+  plus:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>',
+  scale:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 7h14M5 7l-3 6a3 3 0 0 0 6 0zM19 7l-3 6a3 3 0 0 0 6 0zM8 21h8"/></svg>',
+  gear:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg>'
+};
+
+function render(){
+  mounts=[];const v=$('#view');
+  v.innerHTML=PAGES[UI.tab]();
+  v.style.animation='none';void v.offsetWidth;v.style.animation='';
+  $('#title').textContent=TITLES[UI.tab];
+  $$('.tabbar button').forEach(b=>b.classList.toggle('on',b.dataset.tab===UI.tab));
+  mounts.forEach(f=>f());
+}
+
+/* ===== ACCUEIL ===== */
+function entities(){
+  const raw=[{id:'pea',name:'PEA',value:peaValue()},...S.accounts.map(a=>({id:a.id,name:a.name,value:+a.balance||0}))].filter(e=>e.value>0);
+  const main=[],other={id:'other',name:'Autres',value:0,color:OTHER};
+  raw.forEach(e=>{const c=entityColor(e.id);if(c===OTHER)other.value+=e.value;else main.push({...e,color:c})});
+  if(other.value>0)main.push(other);
+  return main.sort((a,b)=>b.value-a.value);
+}
+function insights(){
+  const out=[],L=S.pea.lines,LV=linesValue();
+  if(L.length&&LV){let w=null;L.forEach(l=>{const g=lineVal(l)/LV-tw(l);if(!w||g<w.g)w={l,g}});if(w&&w.g<-0.015)out.push({e:'⚖️',t:`<b>${esc(w.l.name)}</b> est à ${pts(w.g)} de sa cible : c’est la ligne à renforcer en priorité.`})}
+  if(S.pea.cash>1)out.push({e:'💤',t:`<b>${eur(S.pea.cash)}</b> dorment en espèces sur ton PEA.`});
+  const m=monthIn();
+  out.push(m>0?{e:'🔥',t:`Déjà <b>${eur(m,0)}</b> versés en ${MONTHS_L[new Date().getMonth()]}. Continue comme ça.`}:{e:'🔥',t:`Aucun versement enregistré ce mois-ci : même 50 € gardent ta série en vie.`});
+  const it=interestYear();if(it>0)out.push({e:'🪙',t:`Tes comptes rémunérés rapportent environ <b>${eur(it,0)} par an</b>.`});
+  const sm=safetyMonths();if(S.profile.expenses>0&&sm<3)out.push({e:'🛡️',t:`Ton épargne de sécurité couvre <b>${NF1.format(sm)} mois</b> de dépenses. Vise 3 à 6 mois.`});
+  const full=S.accounts.find(a=>a.ceiling>0&&a.balance>=a.ceiling);if(full)out.push({e:'✅',t:`Ton <b>${esc(full.name)}</b> est plein : tes prochains versements seront plus utiles ailleurs.`});
+  return out.slice(0,4);
+}
+function pageHome(){
+  const T=total(),P=peaValue(),A=accTotal(),prev=prevSnap();
+  const delta=prev?(()=>{const d=T-prev.total,r=prev.total?d/prev.total:0;return `<span class="pill ${d>=0?'up':'down'}">${d>=0?'▲':'▼'} ${eurS(d)} · ${pctS(r)}</span> <span class="muted small">depuis ${mLabel(prev.m)}</span>`})():`<span class="pill">✨ Premier mois de suivi</span>`;
+  const G=S.profile.goal||0,gp=goalProg(),gd=S.profile.goalDate?new Date(S.profile.goalDate):null,nm=gd?monthsBetween(new Date(),gd):0,rate=expectedRate(),need=G&&gd?needMonthly(G,T,rate,nm):null;
+  const vm=monthIn(),st=streak(),it=interestYear();
+  const LV=linesValue(),wp=S.pea.lines.filter(l=>l.pru>0),cost=wp.reduce((a,l)=>a+l.qty*l.pru,0),pv=wp.reduce((a,l)=>a+l.qty*(l.price-l.pru),0);
+  mount(drawHistory);mount(drawDonut);
+  const fresh=!S.pea.lines.length&&!S.accounts.length;
+  return `${fresh?`<div class="card" style="border-color:rgba(143,209,106,.35)"><div class="label" style="color:var(--accent)">Bienvenue 👋</div><div class="mid">On démarre ?</div><div class="muted small" style="margin-bottom:14px">Importe le fichier <b style="color:var(--text)">mon-pea.json</b> pour retrouver ton PEA, ou ajoute tes comptes à la main.</div><div class="btns"><button class="btn sm" data-act="import">Importer</button><button class="btn ghost sm" data-act="newLine">Ajouter une ligne</button></div></div>`:''}
+  <div class="card">
+    <div class="label">Patrimoine total</div>
+    <div class="big">${eur(T)}</div>
+    <div>${delta}</div>
+    <div class="split"><span><span class="sw" style="background:${SERIES[0]}"></span>PEA<b>${eur(P,0)}</b></span><span>Épargne & autres<b>${eur(A,0)}</b></span></div>
+    <div class="row" style="margin-top:18px"><span class="label">Évolution</span>${seg('range',['6M','1A','Tout'],UI.range)}</div>
+    <div class="chart" id="histChart"></div>
+  </div>
+  <div class="actions">
+    <button class="act" data-act="checkin">${ICON.check}Bilan du mois</button>
+    <button class="act" data-act="newMove">${ICON.plus}Versement</button>
+    <button class="act" data-act="goRb">${ICON.scale}Rééquilibrer</button>
+  </div>
+  <div class="sec"><h2>Répartition</h2></div>
+  <div class="card">
+    <div class="donut-wrap"><div id="donut"></div><div class="dc" id="dc"></div></div>
+    <div class="legend" id="legend"></div>
+    ${S.accounts.length?'':`<div class="cta" style="margin:14px 0 0" data-act="newAcc">Ajoute ton <b>Livret A, LDDS, assurance vie…</b><br>pour voir ta vraie répartition</div>`}
+  </div>
+  <div class="sec"><h2>Objectif</h2><button class="link" data-act="settings">Modifier</button></div>
+  <div class="card" data-act="settings">
+    ${G?`<div class="goal"><div class="rw">${ring(gp)}<div class="rp">${NF0.format(gp*100)}%</div></div>
+    <div><div class="mid">${eur(G,0)}</div><div class="muted small">${gd?`d’ici ${MONTHS_L[gd.getMonth()]} ${gd.getFullYear()} · reste ${eur(Math.max(0,G-T),0)}`:''}</div>
+    ${need!=null?`<div class="small" style="margin-top:6px">${need>0?`≈ <b>${eur(need,0)}/mois</b> à verser`:'<b>Atteignable sans nouveau versement</b>'}</div><div class="faint tiny">hypothèse : PEA à 7 %/an, livrets à leur taux</div>`:''}</div></div>`:`<div class="muted">Fixe-toi un objectif de patrimoine pour suivre ta progression.</div>`}
+  </div>
+  <div class="sec"><h2>Ce mois-ci</h2></div>
+  <div class="grid2">
+    <div class="tile"><div class="label">Versé</div><div class="v">${eur(vm,0)}</div><div class="s">objectif ${eur(S.profile.monthly||0,0)}/mois</div><div class="track" style="margin:10px 0 0;height:6px"><div class="fill" style="width:${S.profile.monthly?Math.min(100,vm/S.profile.monthly*100):0}%"></div></div></div>
+    <div class="tile" data-act="tab" data-v="track"><div class="label">Série</div><div class="v">🔥 ${st} mois</div><div class="s">${st?'de versements d’affilée':'lance ta série ce mois-ci'}</div></div>
+    <div class="tile"><div class="label">Plus-value PEA</div><div class="v ${wp.length?(pv>=0?'up':'down'):'faint'}">${wp.length?eurS(pv,0):'—'}</div><div class="s">${wp.length?pctS(cost?pv/cost:0)+' sur ton prix d’achat':'renseigne tes PRU dans le PEA'}</div></div>
+    <div class="tile"><div class="label">Intérêts / an</div><div class="v">${eur(it,0)}</div><div class="s">estimés sur tes livrets</div></div>
+  </div>
+  <div class="sec"><h2>À retenir</h2></div>
+  <div class="card">${insights().map(i=>`<div class="ins"><span class="e">${i.e}</span><span>${i.t}</span></div>`).join('')}</div>`;
+}
+function drawHistory(){
+  const el=$('#histChart');if(!el)return;
+  let p=S.snaps.map(s=>({m:s.m,y:s.total}));
+  if(UI.range!=='Tout'){const d=new Date();d.setDate(1);d.setMonth(d.getMonth()-(UI.range==='6M'?5:11));const from=mk(d);p=p.filter(x=>x.m>=from)}
+  if(p.length<2){el.innerHTML=`<div class="empty-chart"><svg width="120" height="40" viewBox="0 0 120 40"><path d="M2 34 L30 28 L52 30 L74 18 L96 20 L118 6" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="4 5" stroke-linecap="round"/><circle cx="118" cy="6" r="4" fill="var(--accent)"/></svg>Ta courbe se dessine mois après mois.<br>Fais ton <b style="color:var(--text)">bilan du mois</b> chaque mois, ou ajoute tes mois passés dans les réglages.</div>`;return}
+  lineChart(el,p.map(x=>mLabel(x.m)),[{name:'Patrimoine',color:'#8fd16a',values:p.map(x=>x.y),area:true}],{endDot:true,aria:'Évolution du patrimoine',tip:i=>`${mLabel(p[i].m)}<br><b>${eur(p[i].y)}</b>`});
+}
+function drawDonut(){
+  const el=$('#donut');if(!el)return;
+  const items=entities(),T=items.reduce((a,e)=>a+e.value,0),S0=176,c=S0/2,R1=86,R0=64;
+  const dc=$('#dc'),lg=$('#legend');
+  if(!T){el.innerHTML=`<svg width="${S0}" height="${S0}"><circle cx="${c}" cy="${c}" r="${(R0+R1)/2}" fill="none" stroke="var(--card2)" stroke-width="${R1-R0}"/></svg>`;dc.innerHTML=`<div class="a">Rien pour l’instant</div>`;lg.innerHTML='';return}
+  let a=-Math.PI/2,body='';const gap=items.length>1?2.2/R1:0;
+  items.forEach((e,i)=>{const sw=e.value/T*2*Math.PI;if(items.length===1)body+=`<circle data-i="${i}" class="seg-d" cx="${c}" cy="${c}" r="${(R0+R1)/2}" fill="none" stroke="${e.color}" stroke-width="${R1-R0}"/>`;else{const a0=a+gap/2,a1=a+sw-gap/2;if(a1>a0)body+=`<path data-i="${i}" class="seg-d" d="${arcPath(c,c,R0,R1,a0,a1)}" fill="${e.color}"/>`}a+=sw});
+  el.innerHTML=`<svg width="${S0}" height="${S0}" viewBox="0 0 ${S0} ${S0}" role="img" aria-label="Répartition du patrimoine">${body}</svg>`;
+  const setC=i=>{if(i==null){dc.innerHTML=`<div class="a">Total</div><div class="b">${eur(T,0)}</div><div class="c">${items.length} poste${items.length>1?'s':''}</div>`}else{const e=items[i];dc.innerHTML=`<div class="a">${esc(e.name)}</div><div class="b">${eur(e.value,0)}</div><div class="c">${pct(e.value/T)}</div>`}$$('.seg-d',el).forEach(p=>p.style.opacity=i==null||+p.dataset.i===i?1:.3);$$('.lg',lg).forEach(r=>r.style.opacity=i==null||+r.dataset.i===i?1:.45)};
+  lg.innerHTML=items.map((e,i)=>`<div class="lg" data-i="${i}"><span class="sw" style="background:${e.color};margin:0"></span><span>${esc(e.name)}</span><span class="p">${pct(e.value/T)}</span><span class="vv">${eur(e.value,0)}</span></div>`).join('');
+  const toggle=i=>{UI.donutSel=UI.donutSel===i?null:i;setC(UI.donutSel)};
+  $$('.seg-d',el).forEach(p=>p.addEventListener('click',()=>toggle(+p.dataset.i)));
+  $$('.lg',lg).forEach(r=>r.addEventListener('click',()=>toggle(+r.dataset.i)));
+  if(UI.donutSel!=null&&UI.donutSel>=items.length)UI.donutSel=null;setC(UI.donutSel);
+}
+
+/* ===== PEA ===== */
+function pagePEA(){
+  const L=S.pea.lines,LV=linesValue(),P=peaValue();
+  const wp=L.filter(l=>l.pru>0),cost=wp.reduce((a,l)=>a+l.qty*l.pru,0),pv=wp.reduce((a,l)=>a+l.qty*(l.price-l.pru),0);
+  const dep=peaDeposits(),age=peaAgeMonths();
+  const scale=Math.max(0.01,...L.map(l=>Math.max(LV?lineVal(l)/LV:0,tw(l))))*1.12;
+  const ts=tsum();
+  mount(drawRebalance);
+  mount(()=>{const i=$('#rbAmt');if(i)i.addEventListener('input',()=>{UI.rbAmount=num(i.value);drawRebalance()})});
+  return `
+  <div class="card">
+    <div class="label">Valeur du PEA</div>
+    <div class="big">${eur(P)}</div>
+    ${wp.length?`<span class="pill ${pv>=0?'up':'down'}">${pv>=0?'▲':'▼'} ${eurS(pv)} · ${pctS(cost?pv/cost:0)}</span> <span class="muted small">plus-value latente</span>`:`<span class="muted small">Ajoute ton PRU (prix de revient) sur chaque ligne pour voir ta plus-value.</span>`}
+    <div class="split"><span>Lignes<b>${eur(LV,0)}</b></span><span>Espèces<b>${eur(+S.pea.cash||0,0)}</b></span><span>Versé<b>${eur(dep,0)}</b></span></div>
+    ${S.settings.priceUrl?`<div class="row small" style="margin-top:14px"><span class="muted"><span class="live"></span>Cours auto · ${fetchTxt()}</span><button class="link" data-act="refreshPrices">Actualiser</button></div>`:`<div class="row small" style="margin-top:14px"><span class="muted"><span class="live off"></span>Cours saisis à la main</span><button class="link" data-act="priceSource">⚡ Passer en auto</button></div>`}
+    <div style="margin-top:16px">
+      <div class="row small"><span class="muted">Plafond de versements</span><span><b>${eur(dep,0)}</b> <span class="faint">/ 150 000 €</span></span></div>
+      <div class="track" style="height:6px;margin:8px 0 0"><div class="fill" style="width:${Math.min(100,dep/150000*100)}%"></div></div>
+    </div>
+    <div style="margin-top:14px">
+      ${age>=0?`<div class="row small"><span class="muted">Ancienneté : ${ageTxt(age)}</span><span>${age>=60?'<b class="up">Fiscalité allégée ✓</b>':`<b>${ageTxt(60-age)}</b> <span class="faint">avant 5 ans</span>`}</span></div><div class="track" style="height:6px;margin:8px 0 0"><div class="fill" style="width:${Math.min(100,age/60*100)}%"></div></div>`:`<button class="link" data-act="peaSettings">+ Renseigner la date d’ouverture du PEA</button>`}
+    </div>
+  </div>
+  <div class="actions">
+    <button class="act" data-act="prices">${ICON.check}Mettre à jour</button>
+    <button class="act" data-act="newLine">${ICON.plus}Ajouter</button>
+    <button class="act" data-act="peaSettings">${ICON.gear}Réglages</button>
+  </div>
+  ${ts&&Math.abs(ts-100)>0.01?`<div class="cta">Tes cibles font <b>${NF1.format(ts)} %</b> au total (au lieu de 100 %). Je les ramène à 100 % dans les calculs.</div>`:''}
+  <div class="sec"><h2>Mes lignes</h2><span class="faint small">${L.length} ligne${L.length>1?'s':''}</span></div>
+  ${L.length?'':'<div class="cta" data-act="newLine">Ajoute ta première ligne : <b>ETF, action…</b></div>'}
+  ${L.map(l=>{const v=lineVal(l),real=LV?v/LV:0,t=tw(l),gap=real-t,tr=trend(l),lp=l.pru>0?(l.price-l.pru)*l.qty:null;
+    return `<div class="card" data-act="editLine" data-id="${l.id}">
+      <div class="row"><div style="min-width:0"><div class="name">${esc(l.name)}<span class="tick">${esc(l.ticker)}</span></div><div class="muted small">${NFq.format(l.qty)} × ${eur(l.price)}${lp!=null?` · <span class="${lp>=0?'up':'down'}">${eurS(lp,0)}</span>`:''}</div></div>
+      <div class="right"><div class="lv">${eur(v)}</div><div class="small ${tr==null?'faint':tr>=0?'up':'down'}">${tr==null?'—':(tr>=0?'▲ ':'▼ ')+pctS(tr)} <span class="faint">1 mois</span></div></div></div>
+      ${spark((l.history||[]).map(h=>h.p),tr!=null&&tr<0?'#d03b3b':'#8fd16a')}
+      <div class="track"><div class="fill" style="width:${real/scale*100}%"></div><div class="target" style="left:${t/scale*100}%"></div></div>
+      <div class="row tiny"><span class="muted" style="white-space:nowrap">Réel <b style="color:var(--text)">${pct(real)}</b> · cible ${pct(t,Math.abs(t*1000-Math.round(t*100)*10)<0.01?0:1)}</span>${status(gap)}</div>
+    </div>`}).join('')}
+  ${L.length?`<div class="note">Barre verte = poids réel · trait blanc = ta cible.</div>`:''}
+  <div class="sec" id="rb"><h2>Rééquilibrage</h2></div>
+  <div class="card">
+    <div class="muted small">Combien veux-tu investir ? Je calcule quoi acheter pour te rapprocher de tes cibles, <b style="color:var(--text)">sans rien vendre</b>, en parts entières.</div>
+    <label class="field" style="margin:14px 0 4px"><span>Montant à investir (€)</span><input id="rbAmt" inputmode="decimal" placeholder="ex : 300" value="${UI.rbAmount!=null?String(UI.rbAmount).replace('.',','):(S.pea.cash>0?String(r2(S.pea.cash)).replace('.',','):'')}"></label>
+    <div id="rbOut"></div>
+  </div>`;
+}
+function drawRebalance(){
+  const el=$('#rbOut');if(!el)return;
+  const i=$('#rbAmt'),amount=i?num(i.value):0;
+  if(!S.pea.lines.length){el.innerHTML='';return}
+  if(amount<=0){el.innerHTML=`<div class="faint small" style="padding:6px 2px">Tape un montant pour voir quoi acheter.</div>`;UI.plan=null;return}
+  const p=rebalancePlan(amount);UI.plan=p;const cash=+S.pea.cash||0,needDep=r2(amount-cash);
+  const rows=p.rows.filter(r=>r.n>0||r.eur>=0.5).sort((a,b)=>b.eur-a.eur);
+  el.innerHTML=rows.map(r=>`<div class="rb-row"><div><div class="n">${esc(r.l.name)}</div><div class="faint tiny">idéal ≈ ${eur(r.eur)} (${NF1.format(r.frac)} part${r.frac>=2?'s':''})</div></div><div class="q">${r.n?`${r.n} part${r.n>1?'s':''}<div class="faint tiny" style="font-weight:500">${eur(r.n*r.l.price)}</div>`:'<span class="faint">—</span>'}</div></div>`).join('')+
+  `<div class="rb-tot"><span class="muted">Total acheté</span><b>${eur(p.spent)}</b></div><div class="rb-tot" style="border:0;padding-top:4px"><span class="muted">Reste en espèces</span><b>${eur(p.left)}</b></div>`+
+  (needDep>0.009?`<label class="check"><input type="checkbox" id="rbDep" checked><span>Enregistrer aussi un <b style="color:var(--text)">versement de ${eur(needDep)}</b> sur le PEA (espèces actuelles : ${eur(cash)})</span></label>`:'')+
+  (p.spent>0?`<button class="btn" data-act="applyRb" style="margin-top:8px">J’ai passé ces ordres ✓</button><div class="note" style="text-align:center">Les quantités, le PRU et les espèces seront mis à jour.</div>`:`<div class="faint small" style="padding:8px 2px">Montant trop faible pour acheter une part entière.</div>`);
+}
+
+/* ===== ÉPARGNE ===== */
+function pageSave(){
+  const A=accTotal(),it=interestYear(),avg=A?it/A:0,sm=safetyMonths(),exp=S.profile.expenses||0;
+  const by=g=>S.accounts.filter(a=>accType(a).group===g);
+  const card=a=>{const c=entityColor(a.id),b=+a.balance||0,i=b*(+a.rate||0)/100,cp=a.ceiling>0?b/a.ceiling:0;
+    return `<div class="card" data-act="editAcc" data-id="${a.id}">
+      <div class="row"><div class="row" style="gap:12px;justify-content:flex-start;min-width:0"><div class="av" style="background:${c}26;color:${c}">${esc(initials(a.name))}</div><div style="min-width:0"><div class="name">${esc(a.name)}</div><div class="muted small">${esc(accType(a).label)}${a.rate?` · ${NF2.format(a.rate)} %`:''}</div></div></div>
+      <div class="right"><div class="lv">${eur(b)}</div><div class="small ${i>0?'up':'faint'}">${i>0?`+${eur(i,0)}/an`:''}</div></div></div>
+      ${a.ceiling>0?`<div class="track"><div class="fill" style="width:${Math.min(100,cp*100)}%;background:${c}"></div></div><div class="row tiny"><span class="muted">${pct(Math.min(1,cp),0)} du plafond (${eur(a.ceiling,0)})</span>${cp>=1?'<span class="status"><i style="background:var(--good)"></i>Plein</span>':`<span class="muted">reste ${eur(a.ceiling-b,0)}</span>`}</div>`:''}
+    </div>`};
+  return `
+  <div class="card">
+    <div class="label">Épargne & autres avoirs</div>
+    <div class="big">${eur(A)}</div>
+    <div class="split"><span>Intérêts estimés<b>${eur(it,0)}/an</b></span><span>Taux moyen<b>${NF2.format(avg*100)} %</b></span></div>
+  </div>
+  <div class="card" data-act="settings">
+    <div class="row"><span class="label">Épargne de sécurité</span><span class="faint tiny">livrets</span></div>
+    ${exp>0?`<div class="mid">${NF1.format(sm)} mois <span class="muted small" style="font-weight:500">de dépenses couverts</span></div>
+      <div class="track" style="height:10px"><div class="fill" style="width:${Math.min(100,sm/6*100)}%;background:${sm>=3?'var(--accent)':'var(--serious)'}"></div><div class="target" style="left:50%"></div></div>
+      <div class="row tiny muted"><span>0</span><span>3 mois</span><span>6 mois</span></div>`
+      :`<div class="muted small" style="margin-top:8px">Indique tes <b style="color:var(--text)">dépenses mensuelles</b> dans les réglages pour savoir combien de mois ton épargne de sécurité couvre (conseil : 3 à 6 mois).</div>`}
+  </div>
+  ${['reg','inv','other'].map(g=>{const list=by(g);if(!list.length)return '';return `<div class="sec"><h2>${GROUPS[g]}</h2><span class="faint small">${eur(list.reduce((a,x)=>a+(+x.balance||0),0),0)}</span></div>${list.map(card).join('')}`}).join('')}
+  ${S.accounts.length?'':`<div class="cta" data-act="newAcc" style="margin-top:12px">Aucun compte pour l’instant.<br><b>Ajoute ton Livret A, LDDS, LEP, assurance vie…</b></div>`}
+  <button class="btn ghost" data-act="newAcc" style="margin-top:12px">+ Ajouter un compte</button>
+  <div class="note">Taux réglementés au 15/11/2026 : Livret A et LDDS 1,7 %, LEP 2,5 %, CEL 1,25 %, PEL ouvert en 2026 2 %. Prochaine révision le 1<sup>er</sup> février 2027 : pense à mettre tes taux à jour.</div>`;
+}
+
+/* ===== SUIVI ===== */
+const BADGES=[
+  {e:'🌱',t:'Premier pas',d:'Enregistrer ton premier versement',ok:()=>S.moves.some(m=>m.amount>0)},
+  {e:'🔥',t:'3 mois',d:'3 mois de versements d’affilée',ok:()=>streak()>=3},
+  {e:'⚡️',t:'6 mois',d:'6 mois de versements d’affilée',ok:()=>streak()>=6},
+  {e:'🏆',t:'1 an',d:'12 mois de versements d’affilée',ok:()=>streak()>=12},
+  {e:'💶',t:'10 k€',d:'Atteindre 10 000 € de patrimoine',ok:()=>total()>=1e4},
+  {e:'💎',t:'25 k€',d:'Atteindre 25 000 € de patrimoine',ok:()=>total()>=2.5e4},
+  {e:'🚀',t:'50 k€',d:'Atteindre 50 000 € de patrimoine',ok:()=>total()>=5e4},
+  {e:'👑',t:'100 k€',d:'Atteindre 100 000 € de patrimoine',ok:()=>total()>=1e5},
+  {e:'⚖️',t:'Équilibré',d:'Toutes les lignes du PEA à ±1,5 pt de leur cible',ok:peaBalanced},
+  {e:'🛡️',t:'Bouclier',d:'3 mois de dépenses en épargne de sécurité',ok:()=>safetyMonths()>=3},
+  {e:'🎯',t:'Mi-chemin',d:'50 % de ton objectif de patrimoine',ok:()=>goalProg()>=.5},
+  {e:'⏳',t:'PEA 5 ans',d:'Ton PEA a 5 ans : fiscalité allégée',ok:()=>peaAgeMonths()>=60}
+];
+function pageTrack(){
+  const st=streak(),y=String(new Date().getFullYear()),vy=S.moves.filter(m=>m.amount>0&&m.d.startsWith(y)).reduce((a,m)=>a+m.amount,0);
+  const d=new Date();d.setDate(1);d.setMonth(d.getMonth()-5);const from=mk(d);
+  const avg6=S.moves.filter(m=>m.amount>0&&m.d.slice(0,7)>=from).reduce((a,m)=>a+m.amount,0)/6;
+  const got=BADGES.filter(b=>b.ok()).length;
+  mount(drawBars);mount(drawProjection);
+  mount(()=>{const i=$('#projM');if(i)i.addEventListener('input',()=>{UI.projMonthly=num(i.value);drawProjection()})});
+  const mv=S.moves.slice().sort((a,b)=>a.d<b.d?1:a.d>b.d?-1:0);
+  const accName=id=>id==='pea'?'PEA':(S.accounts.find(a=>a.id===id)||{name:'Compte supprimé'}).name;
+  return `
+  <div class="card">
+    <div class="row"><div><div class="label">Série en cours</div><div class="big" style="margin-bottom:2px">${st} mois</div><div class="muted small">${st?'de versements d’affilée. Ne casse pas la chaîne !':'Fais un versement ce mois-ci pour lancer ta série.'}</div></div><div class="flame">${st?'🔥':'🕯️'}</div></div>
+    <div class="split"><span>Versé en ${y}<b>${eur(vy,0)}</b></span><span>Moyenne 6 mois<b>${eur(avg6,0)}/mois</b></span></div>
+    <button class="btn" data-act="newMove" style="margin-top:16px">+ Nouveau versement</button>
+  </div>
+  <div class="sec"><h2>Versements</h2><span class="faint small">12 derniers mois</span></div>
+  <div class="card"><div class="chart" id="bars" style="margin-top:0"></div></div>
+  <div class="sec"><h2>Badges</h2><span class="faint small">${got}/${BADGES.length}</span></div>
+  <div class="badges">${BADGES.map((b,i)=>`<button class="badge ${b.ok()?'on':''}" data-act="badge" data-v="${i}"><div class="e">${b.e}</div><div class="t">${b.t}</div></button>`).join('')}</div>
+  <div class="sec"><h2>Projection du PEA</h2></div>
+  <div class="card">
+    <label class="field" style="margin:0 0 12px"><span>Versement mensuel (€)</span><input id="projM" inputmode="decimal" value="${String(UI.projMonthly??S.profile.monthly??0).replace('.',',')}"></label>
+    <div class="row"><span class="label">Horizon</span>${seg('horizon',[10,15,20],UI.horizon)}</div>
+    <div id="projOut"></div>
+  </div>
+  <div class="sec"><h2>Historique</h2><span class="faint small">${mv.length} mouvement${mv.length>1?'s':''}</span></div>
+  <div class="card">${mv.length?mv.slice(0,60).map(m=>`<div class="mv"><div><div style="font-weight:650">${esc(accName(m.acc))}</div><div class="faint tiny">${dLabel(m.d)}${m.note?' · '+esc(m.note):''}</div></div><div class="${m.amount>=0?'up':'down'}" style="font-weight:700">${eurS(m.amount)}</div><button class="del" data-act="delMove" data-id="${m.id}" aria-label="Supprimer">✕</button></div>`).join(''):'<div class="muted small">Tes versements apparaîtront ici.</div>'}</div>`;
+}
+function drawBars(){
+  const el=$('#bars');if(!el)return;const items=[];const d=new Date();d.setDate(1);d.setMonth(d.getMonth()-11);
+  for(let i=0;i<12;i++){const m=mk(d);items.push({m,l:MONTHS[d.getMonth()].charAt(0).toUpperCase(),v:monthIn(m),cur:i===11});d.setMonth(d.getMonth()+1)}
+  barChart(el,items,{aria:'Versements par mois',tip:x=>`${MONTHS_L[+x.m.slice(5)-1]} ${x.m.slice(0,4)}<br><b>${eur(x.v,0)}</b>`});
+}
+function drawProjection(){
+  const el=$('#projOut');if(!el)return;
+  const m=UI.projMonthly??S.profile.monthly??0,N=UI.horizon,P0=peaValue();
+  const sc=[{name:'Favorable',r:.09,color:SERIES[2]},{name:'Moyen',r:.07,color:SERIES[1]},{name:'Prudent',r:.04,color:SERIES[0]}];
+  const yrs=[...Array(N+1).keys()];
+  const series=sc.map(s=>({name:s.name,color:s.color,values:yrs.map(y=>fv(P0,m,s.r,y*12))}));
+  const dep=yrs.map(y=>P0+m*12*y);
+  series.push({name:'Versé',color:'#8a8a84',values:dep,dash:true});
+  el.innerHTML=`<div class="chart" id="projChart"></div>
+  <div class="legend" style="margin-top:6px">${series.map(s=>`<div class="lg" style="grid-template-columns:auto 1fr auto"><span class="sw" style="background:${s.color};margin:0"></span><span>${s.name}${s.dash?'':` <span class="faint tiny">${NF0.format(sc.find(x=>x.name===s.name).r*100)} %/an</span>`}</span><span class="vv">${eur(s.values[N],0)}</span></div>`).join('')}</div>
+  <div class="note">Dans ${N} ans, avant inflation (≈ 2 %/an) et avant prélèvements sociaux (17,2 % sur les gains au retrait). Hypothèses, pas des promesses.</div>`;
+  lineChart($('#projChart'),yrs.map(y=>y?`+${y} a`:'auj.'),series,{h:200,pr:70,direct:true,endDot:true,xticks:3,aria:'Projection du PEA',tip:i=>`<div>Dans ${i} an${i>1?'s':''}</div>${series.map(s=>`<div class="k"><span class="sw" style="background:${s.color};margin:0"></span>${s.name} <b style="margin-left:auto;padding-left:10px">${eur(s.values[i],0)}</b></div>`).join('')}`});
+}
+
+const PAGES={home:pageHome,pea:pagePEA,save:pageSave,track:pageTrack};
+
+/* ---------- feuilles (modales) ---------- */
+function openSheet(title,html,onMount){
+  const w=$('#sheet');
+  w.innerHTML=`<div class="backdrop" data-act="closeSheet"></div><div class="panel" role="dialog" aria-modal="true"><div class="grab"></div><div class="sheet-head"><h3>${title}</h3><button class="icon-btn" data-act="closeSheet" aria-label="Fermer">✕</button></div><div class="sheet-body">${html}</div></div>`;
+  w.hidden=false;requestAnimationFrame(()=>requestAnimationFrame(()=>w.classList.add('open')));
+  onMount&&onMount(w);
+}
+function closeSheet(){const w=$('#sheet');w.classList.remove('open');setTimeout(()=>{if(!w.classList.contains('open')){w.hidden=true;w.innerHTML=''}},300)}
+const fv$=(n)=>{const e=$(`#sheet [name="${n}"]`);return e?e.value:''};
+const field=(label,name,val='',type='text',extra='')=>`<label class="field"><span>${label}</span><input name="${name}" type="${type}" ${type==='text'&&/num/.test(extra)?'inputmode="decimal"':''} value="${esc(val)}" ${extra.replace('num','')}></label>`;
+const nv=v=>v==null||v===''?'':String(v).replace('.',',');
+let toastT;function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('show'),2200)}
+function commit(msg){save();render();if(msg)toast(msg)}
+
+function openLine(id){
+  const l=id?S.pea.lines.find(x=>x.id===id):null;
+  openSheet(l?esc(l.name):'Nouvelle ligne',`
+    ${field('Nom','name',l?l.name:'','text','placeholder="ex : MSCI World"')}
+    <div class="f2">${field('Ticker','ticker',l?l.ticker:'','text','placeholder="ex : ESE" autocapitalize="characters"')}${field('Cible (%)','target',l?nv(l.target):'','text','num placeholder="ex : 30"')}</div>
+    <div class="f2">${field('Quantité','qty',l?nv(l.qty):'','text','num placeholder="0"')}${field('Cours actuel (€)','price',l?nv(l.price):'','text','num placeholder="0,00"')}</div>
+    ${field('PRU – prix de revient unitaire (€, optionnel)','pru',l&&l.pru?nv(l.pru):'','text','num placeholder="dans ton appli de courtage"')}
+    <button class="btn" data-act="saveLine" data-id="${id||''}">Enregistrer</button>
+    ${l?'<button class="btn danger" data-act="delLine" data-id="'+id+'" style="margin-top:10px">Supprimer la ligne</button>':''}`);
+}
+function openAcc(id){
+  const a=id?S.accounts.find(x=>x.id===id):null,t=a?a.type:'livretA',T=TYPES[t];
+  openSheet(a?esc(a.name):'Nouveau compte',`
+    <label class="field"><span>Type</span><select name="type">${Object.entries(TYPES).map(([k,v])=>`<option value="${k}" ${k===t?'selected':''}>${v.label}</option>`).join('')}</select></label>
+    ${field('Nom','name',a?a.name:T.label)}
+    ${field('Solde actuel (€)','balance',a?nv(a.balance):'','text','num placeholder="0,00"')}
+    <div class="f2">${field('Taux annuel (%)','rate',a?nv(a.rate):nv(T.rate),'text','num')}${field('Plafond (€)','ceiling',a?nv(a.ceiling||''):nv(T.ceiling||''),'text','num placeholder="aucun"')}</div>
+    <button class="btn" data-act="saveAcc" data-id="${id||''}">Enregistrer</button>
+    ${a?`<div class="sh-sub">Mouvement rapide</div>
+      ${field('Montant (€)','qamt','','text','num placeholder="ex : 100"')}
+      <div class="btns"><button class="btn ghost sm" data-act="quickMove" data-id="${id}" data-v="1">+ Versement</button><button class="btn ghost sm" data-act="quickMove" data-id="${id}" data-v="-1">− Retrait</button></div>
+      <div class="hr"></div><button class="btn danger" data-act="delAcc" data-id="${id}">Supprimer le compte</button>`:''}`,
+  w=>{if(!a){const s=$('[name="type"]',w);s.addEventListener('change',()=>{const T=TYPES[s.value];$('[name="name"]',w).value=T.label;$('[name="rate"]',w).value=nv(T.rate);$('[name="ceiling"]',w).value=nv(T.ceiling||'')})}});
+}
+function openMove(){
+  const opts=[{id:'pea',name:'PEA'},...S.accounts];
+  openSheet('Nouveau mouvement',`
+    <label class="field"><span>Type</span><select name="kind"><option value="1">Versement</option><option value="-1">Retrait</option></select></label>
+    <label class="field"><span>Compte</span><select name="acc">${opts.map(o=>`<option value="${o.id}">${esc(o.name)}</option>`).join('')}</select></label>
+    ${field('Montant (€)','amount','','text','num placeholder="ex : 200"')}
+    <div class="f2">${field('Date','date',iso(),'date')}${field('Note','note','','text','placeholder="optionnel"')}</div>
+    <button class="btn" data-act="saveMove">Enregistrer</button>
+    <div class="note">Un versement sur le PEA s’ajoute à ses espèces. Utilise ensuite le rééquilibrage pour savoir quoi acheter.</div>`);
+}
+function openCheckin(onlyPea){
+  const L=S.pea.lines,A=S.accounts,now=new Date();
+  openSheet(onlyPea?'Mettre à jour les cours':`Bilan de ${MONTHS_L[now.getMonth()]}`,`
+    <div class="muted small" style="margin:-4px 2px 10px">${onlyPea?'Recopie les cours depuis ton appli de courtage.':'Mets à jour tes cours et tes soldes : ça prend 1 minute, et ta courbe gagne un point.'}</div>
+    ${L.length?`<div class="sh-sub">PEA · cours (€)</div>${L.map(l=>`<div class="pr-row"><div><div style="font-weight:650">${esc(l.name)}</div><div class="faint tiny">${esc(l.ticker)} · ${NFq.format(l.qty)} part${l.qty>1?'s':''}</div></div><input inputmode="decimal" data-price="${l.id}" value="${nv(l.price)}"></div>`).join('')}
+    <div class="pr-row"><div><div style="font-weight:650">Espèces PEA</div><div class="faint tiny">solde non investi</div></div><input inputmode="decimal" data-cash="1" value="${nv(r2(+S.pea.cash||0))}"></div>`:''}
+    ${!onlyPea&&A.length?`<div class="sh-sub">Comptes · soldes (€)</div>${A.map(a=>`<div class="pr-row"><div><div style="font-weight:650">${esc(a.name)}</div><div class="faint tiny">${esc(accType(a).label)}</div></div><input inputmode="decimal" data-bal="${a.id}" value="${nv(a.balance)}"></div>`).join('')}`:''}
+    <button class="btn" data-act="saveCheckin" style="margin-top:14px">Enregistrer</button>`);
+}
+function openPeaSettings(){
+  openSheet('Réglages du PEA',`
+    ${field('Date d’ouverture','openDate',S.pea.openDate||'','date')}
+    ${field('Versements cumulés avant l’app (€)','depositsBase',nv(S.pea.depositsBase||''),'text','num placeholder="dans ton appli de courtage"')}
+    ${field('Espèces disponibles (€)','cash',nv(r2(+S.pea.cash||0)),'text','num')}
+    <button class="btn" data-act="savePea">Enregistrer</button>
+    <div class="note">La date d’ouverture sert à suivre les 5 ans (fiscalité allégée). Les versements servent au plafond de 150 000 €.</div>`);
+}
+function openSettings(){
+  const p=S.profile,snaps=S.snaps.slice().reverse();
+  openSheet('Réglages',`
+    <div class="sh-sub" style="margin-top:0">Objectifs</div>
+    <div class="f2">${field('Objectif (€)','goal',nv(p.goal||''),'text','num')}${field('Date','goalDate',p.goalDate||'','date')}</div>
+    <div class="f2">${field('Versement prévu / mois','monthly',nv(p.monthly||''),'text','num')}${field('Dépenses / mois','expenses',nv(p.expenses||''),'text','num placeholder="pour l’épargne de sécurité"')}</div>
+    <button class="btn" data-act="saveSettings">Enregistrer</button>
+    <div class="sh-sub">Cours automatiques</div>
+    <button class="btn ghost sm" data-act="priceSource">${S.settings.priceUrl?'✓ Google Sheets connecté · modifier':'⚡ Connecter mon Google Sheet'}</button>
+    <div class="sh-sub">Historique du patrimoine</div>
+    <div class="muted small" style="margin:0 2px 10px">Ajoute tes mois passés pour remplir ta courbe tout de suite.</div>
+    <div class="f2">${field('Mois','hm','','month')}${field('Patrimoine total (€)','hv','','text','num')}</div>
+    <button class="btn ghost" data-act="addSnap">+ Ajouter ce mois</button>
+    <div style="margin-top:10px">${snaps.map(s=>`<div class="mv" style="grid-template-columns:1fr auto auto"><span>${MONTHS_L[+s.m.slice(5)-1]} ${s.m.slice(0,4)}</span><b>${eur(s.total,0)}</b>${s.m===mk()?'<span class="faint tiny" style="width:30px;text-align:center">auto</span>':`<button class="del" data-act="delSnap" data-v="${s.m}">✕</button>`}</div>`).join('')}</div>
+    <div class="sh-sub">Mes données</div>
+    <div class="muted small" style="margin:0 2px 10px">Tout reste sur ce téléphone, rien n’est envoyé nulle part. Fais une sauvegarde de temps en temps.</div>
+    <div class="btns"><button class="btn ghost sm" data-act="export">Exporter</button><button class="btn ghost sm" data-act="import">Importer</button></div>
+    <button class="btn ghost sm" data-act="install" style="margin-top:10px">Installer sur l’écran d’accueil</button>
+    <button class="btn danger sm" data-act="reset" style="margin-top:10px">Tout effacer</button>`);
+}
+function openPriceSource(){
+  const L=S.pea.lines,url=S.settings.priceUrl||'';
+  const tab='Ticker\tCours\n'+L.map((l,i)=>`${sheetT(l.ticker)}\t=GOOGLEFINANCE(A${i+2})`).join('\n');
+  openSheet('Cours automatiques',`
+    <div class="muted small" style="margin:-4px 2px 6px">L’app va lire tes cours dans un petit onglet de ton Google Sheet, à chaque ouverture. Retard d’environ 20 minutes, comme dans Google Sheets.</div>
+    <ol class="steps">
+      <li>Crée un <b>nouveau Google Sheet</b> rien que pour les cours (le plus sûr), ou un onglet <b>Cours</b> dans le tien.</li>
+      <li>Remplis-le comme ceci (colonne A = ticker, colonne B = formule) :</li>
+    </ol>
+    <div class="code">${esc(tab).replace(/\t/g,'   ')}</div>
+    <button class="btn ghost sm" data-act="copyTab">Copier ce tableau</button>
+    <ol class="steps" start="3" style="margin-top:12px">
+      <li><b>Fichier → Partager → Publier sur le Web</b>. Choisis l’onglet des cours (pas « Document entier ») et le format <b>CSV</b>, puis <b>Publier</b>.</li>
+      <li>Copie le lien obtenu et colle-le ici :</li>
+    </ol>
+    ${field('Lien CSV publié','purl',url,'url','placeholder="https://docs.google.com/spreadsheets/d/e/…/pub?…output=csv" autocapitalize="off" autocorrect="off"')}
+    <button class="btn" data-act="savePriceSource">Enregistrer et tester</button>
+    <div id="psOut" style="margin-top:12px"></div>
+    ${url?'<button class="btn danger sm" data-act="clearPriceSource" style="margin-top:6px">Déconnecter</button>':''}
+    <div class="note">Seul ce qui est publié devient public : n’y mets <b>ni quantités ni montants</b>. Tes données restent sur ton téléphone. Si tu ajoutes une ligne au PEA, ajoute aussi son ticker dans l’onglet.</div>`);
+}
+function openInstall(){
+  openSheet('Installer sur ton iPhone',`<ol class="steps">
+    <li>Ouvre cette page dans <b>Safari</b>.</li>
+    <li>Touche le bouton <b>Partager</b> (carré avec une flèche).</li>
+    <li>Choisis <b>« Sur l’écran d’accueil »</b>, puis <b>Ajouter</b>.</li>
+    <li>Ouvre l’app depuis la nouvelle icône : elle s’affiche en plein écran, comme une vraie app.</li></ol>
+    <div class="note" style="margin-top:14px">Les données de l’app installée sont propres à l’icône. Exporte une sauvegarde de temps en temps (Réglages → Exporter).</div>`);
+}
+
+/* ---------- actions ---------- */
+const ACT={
+  tab:(id,el)=>{UI.tab=el.dataset.v;render();window.scrollTo(0,0)},
+  seg:(id,el)=>{const k=el.dataset.k,v=el.dataset.v;UI[k]=k==='horizon'?+v:v;if(k==='horizon'){$$('.seg button[data-k="horizon"]').forEach(b=>b.classList.toggle('on',b.dataset.v===v));drawProjection()}else{$$('.seg button[data-k="'+k+'"]').forEach(b=>b.classList.toggle('on',b.dataset.v===v));drawHistory()}},
+  closeSheet:()=>closeSheet(),
+  settings:()=>openSettings(),
+  checkin:()=>openCheckin(false),
+  prices:()=>openCheckin(true),
+  newMove:()=>openMove(),
+  newLine:()=>openLine(),
+  editLine:id=>openLine(id),
+  newAcc:()=>openAcc(),
+  editAcc:id=>openAcc(id),
+  peaSettings:()=>openPeaSettings(),
+  install:()=>openInstall(),
+  priceSource:()=>openPriceSource(),
+  refreshPrices:async()=>{const r=await fetchPrices(true);if(r&&!r.error)render()},
+  copyTab:async()=>{const t='Ticker\tCours\n'+S.pea.lines.map((l,i)=>`${sheetT(l.ticker)}\t=GOOGLEFINANCE(A${i+2})`).join('\n');try{await navigator.clipboard.writeText(t);toast('Tableau copié ✓')}catch(e){toast('Copie impossible : recopie-le à la main')}},
+  savePriceSource:async()=>{const u=fv$('purl').trim();if(!/^https:\/\//.test(u))return toast('Colle le lien qui commence par https://');S.settings.priceUrl=u;save();const out=$('#psOut');if(out)out.innerHTML='<div class="muted small">Test en cours…</div>';const r=await fetchPrices(false);render();if(!out||!out.isConnected)return;if(!r||r.error){out.innerHTML=`<div class="cta" style="border-color:rgba(208,59,59,.5);background:rgba(208,59,59,.06);text-align:left">Impossible de lire ce lien. Vérifie que tu as bien choisi <b>CSV</b> et l’onglet <b>Cours</b> dans « Publier sur le Web », et que ton téléphone est connecté.</div>`;return}out.innerHTML=`<div class="cta" style="text-align:left"><b>✓ ${r.n}/${S.pea.lines.length} lignes mises à jour</b>${r.miss.length?`<br>Pas trouvé : ${r.miss.map(esc).join(', ')}. Vérifie que le ticker de la ligne (ex : ESE) correspond à celui du Sheet (ex : EPA:ESE).`:'<br>Tes cours se mettront à jour à chaque ouverture de l’app.'}</div>`},
+  clearPriceSource:()=>{S.settings.priceUrl='';S.settings.lastFetch=0;closeSheet();commit('Cours auto déconnectés')},
+  goRb:()=>{UI.tab='pea';render();setTimeout(()=>{const r=$('#rb');if(r)window.scrollTo({top:r.getBoundingClientRect().top+window.scrollY-90,behavior:'smooth'});setTimeout(()=>{const i=$('#rbAmt');if(i)i.focus()},450)},60)},
+  badge:(id,el)=>{const b=BADGES[+el.dataset.v];toast(`${b.e} ${b.d}${b.ok()?' ✓':''}`)},
+  saveLine:id=>{
+    const name=fv$('name').trim();if(!name)return toast('Donne un nom à la ligne');
+    const price=num(fv$('price'));let l=id?S.pea.lines.find(x=>x.id===id):null;
+    if(!l){l={id:uid(),history:[]};S.pea.lines.push(l)}
+    Object.assign(l,{name,ticker:fv$('ticker').trim().toUpperCase(),qty:num(fv$('qty')),price,pru:num(fv$('pru')),target:num(fv$('target'))});
+    if(price>0)recordPrice(l,price);closeSheet();commit('Ligne enregistrée');
+  },
+  delLine:id=>{if(!confirm('Supprimer cette ligne ?'))return;S.pea.lines=S.pea.lines.filter(l=>l.id!==id);closeSheet();commit('Ligne supprimée')},
+  saveAcc:id=>{
+    const name=fv$('name').trim();if(!name)return toast('Donne un nom au compte');
+    let a=id?S.accounts.find(x=>x.id===id):null;if(!a){a={id:uid(),created:iso()};S.accounts.push(a)}
+    Object.assign(a,{type:fv$('type'),name,balance:r2(num(fv$('balance'))),rate:num(fv$('rate')),ceiling:num(fv$('ceiling'))});
+    closeSheet();commit('Compte enregistré');
+  },
+  delAcc:id=>{if(!confirm('Supprimer ce compte ? Son historique de mouvements restera visible.'))return;S.accounts=S.accounts.filter(a=>a.id!==id);closeSheet();commit('Compte supprimé')},
+  quickMove:(id,el)=>{const amt=num(fv$('qamt'));if(amt<=0)return toast('Indique un montant');const s=+el.dataset.v,a=S.accounts.find(x=>x.id===id);a.balance=r2((+a.balance||0)+s*amt);S.moves.push({id:uid(),d:iso(),acc:id,amount:s*amt,note:''});closeSheet();commit(s>0?'Versement enregistré 🔥':'Retrait enregistré')},
+  saveMove:()=>{
+    const amt=num(fv$('amount'));if(amt<=0)return toast('Indique un montant');
+    const s=+fv$('kind'),acc=fv$('acc'),d=fv$('date')||iso();
+    if(acc==='pea')S.pea.cash=r2((+S.pea.cash||0)+s*amt);else{const a=S.accounts.find(x=>x.id===acc);if(a)a.balance=r2((+a.balance||0)+s*amt)}
+    S.moves.push({id:uid(),d,acc,amount:s*amt,note:fv$('note').trim()});closeSheet();commit(s>0?'Versement enregistré 🔥':'Retrait enregistré');
+  },
+  delMove:id=>{const m=S.moves.find(x=>x.id===id);if(!m||!confirm('Supprimer ce mouvement ? Le solde du compte sera ajusté.'))return;if(m.acc==='pea')S.pea.cash=r2((+S.pea.cash||0)-m.amount);else{const a=S.accounts.find(x=>x.id===m.acc);if(a)a.balance=r2((+a.balance||0)-m.amount)}S.moves=S.moves.filter(x=>x.id!==id);commit('Mouvement supprimé')},
+  saveCheckin:()=>{
+    $$('#sheet [data-price]').forEach(i=>{const l=S.pea.lines.find(x=>x.id===i.dataset.price),p=num(i.value);if(l&&p>0){l.price=p;recordPrice(l,p)}});
+    const c=$('#sheet [data-cash]');if(c)S.pea.cash=r2(num(c.value));
+    $$('#sheet [data-bal]').forEach(i=>{const a=S.accounts.find(x=>x.id===i.dataset.bal);if(a)a.balance=r2(num(i.value))});
+    closeSheet();commit('Bilan enregistré ✓');
+  },
+  savePea:()=>{S.pea.openDate=fv$('openDate');S.pea.depositsBase=num(fv$('depositsBase'));S.pea.cash=r2(num(fv$('cash')));closeSheet();commit('PEA mis à jour')},
+  applyRb:()=>{
+    const p=UI.plan;if(!p||p.spent<=0)return;
+    const dep=$('#rbDep');if(dep&&dep.checked){const add=r2(p.amount-(+S.pea.cash||0));if(add>0){S.pea.cash=r2((+S.pea.cash||0)+add);S.moves.push({id:uid(),d:iso(),acc:'pea',amount:add,note:'Versement PEA'})}}
+    p.rows.forEach(r=>{if(!r.n)return;const l=S.pea.lines.find(x=>x.id===r.l.id);if(!l)return;const q0=+l.qty||0;if(l.pru>0||q0===0)l.pru=r2(((q0*(l.pru||0))+r.n*l.price)/(q0+r.n));l.qty=q0+r.n;S.pea.cash=r2((+S.pea.cash||0)-r.n*l.price);recordPrice(l,l.price)});
+    UI.rbAmount=null;UI.plan=null;commit('Achats enregistrés ✓');
+  },
+  saveSettings:()=>{Object.assign(S.profile,{goal:num(fv$('goal')),goalDate:fv$('goalDate'),monthly:num(fv$('monthly')),expenses:num(fv$('expenses'))});UI.projMonthly=null;closeSheet();commit('Réglages enregistrés')},
+  addSnap:()=>{const m=fv$('hm'),v=num(fv$('hv'));if(!/^\d{4}-\d{2}$/.test(m)||v<=0)return toast('Choisis un mois et un montant');if(m>=mk())return toast('Choisis un mois passé');const i=S.snaps.findIndex(s=>s.m===m),s={m,total:r2(v),manual:true};if(i>=0)S.snaps[i]=s;else S.snaps.push(s);S.snaps.sort((a,b)=>a.m<b.m?-1:1);save();render();openSettings();toast('Mois ajouté')},
+  delSnap:(id,el)=>{S.snaps=S.snaps.filter(s=>s.m!==el.dataset.v);save();render();openSettings()},
+  export:async()=>{const name=`patrimoine-${iso()}.json`,file=new File([JSON.stringify(S,null,1)],name,{type:'application/json'});try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'Sauvegarde Patrimoine'});return}}catch(e){if(e.name==='AbortError')return}const a=document.createElement('a');a.href=URL.createObjectURL(file);a.download=name;document.body.appendChild(a);a.click();a.remove()},
+  import:()=>$('#importFile').click(),
+  reset:()=>{if(!confirm('Effacer toutes tes données ? (fais d’abord une sauvegarde)'))return;if(!confirm('Vraiment tout effacer ?'))return;S=seed();closeSheet();commit('Données effacées')}
+};
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-tab]');if(t&&t.closest('.tabbar')){UI.tab=t.dataset.tab;render();window.scrollTo(0,0);return}
+  const a=e.target.closest('[data-act]');if(!a)return;
+  if(a.matches('input,select,label'))return;
+  const f=ACT[a.dataset.act];if(f){e.preventDefault();f(a.dataset.id,a,e)}
+});
+$('#importFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const o=JSON.parse(await f.text());if(!o||!o.pea||!o.accounts)throw 0;if(!confirm('Remplacer tes données actuelles par cette sauvegarde ?'))return;S=o;S.moves=S.moves||[];S.snaps=S.snaps||[];S.settings=S.settings||{};closeSheet();commit('Sauvegarde importée ✓')}catch(_){toast('Fichier de sauvegarde invalide')}e.target.value=''});
+
+/* ---------- démarrage ---------- */
+(function init(){
+  S=load();if(!S){S=seed();save()}else{S.moves=S.moves||[];S.snaps=S.snaps||[];save()}
+  S.settings=S.settings||{};
+  const d=new Date();const hs=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});$('#hello').textContent=hs.charAt(0).toUpperCase()+hs.slice(1);
+  try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+  render();
+  const auto=()=>{if(S.settings.priceUrl&&Date.now()-(S.settings.lastFetch||0)>5*60*1000)fetchPrices(false).then(r=>{if(r&&!r.error&&$('#sheet').hidden)render()})};
+  auto();document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')auto()});
+  let rw=window.innerWidth,rt;window.addEventListener('resize',()=>{if(window.innerWidth===rw)return;rw=window.innerWidth;clearTimeout(rt);rt=setTimeout(render,150)});
+})();
+</script>
+</body>
+</html>
