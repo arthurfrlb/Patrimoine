@@ -505,7 +505,7 @@ function last12(fn){const out=[];for(let k=11;k>=0;k--){const m=addM(mk(),-k);ou
 function ring(p,size=92,sw=10){const r=(size-sw)/2,C=2*Math.PI*r,c=size/2;return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="var(--card2)" stroke-width="${sw}"/>${p>0?`<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="var(--accent)" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${(C*Math.min(1,p)).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 ${c} ${c})"/>`:''}</svg>`}
 
 /* ============ interface ============ */
-const UI={tab:'home',period:'12m',m:mk(),year:new Date().getFullYear(),filter:'all',showAll:false,showSales:false,invLimit:6};
+const UI={tab:'home',metric:'net',period:'12m',m:mk(),year:new Date().getFullYear(),filter:'all',showAll:false,showSales:false,invLimit:6};
 let mounts=[];const mount=f=>mounts.push(f);
 const TITLES={home:'Ma Micro',atelier:'Atelier',neon:'La Boîte à Néon',factures:'Factures',stats:'Stats'};
 function render(){ensureLbnInvoices();mounts=[];const v=$('#view');v.innerHTML=PAGES[UI.tab]();v.style.animation='none';void v.offsetWidth;v.style.animation='';$('#title').textContent=TITLES[UI.tab];$$('.tabbar button').forEach(b=>b.classList.toggle('on',b.dataset.tab===UI.tab));mounts.forEach(f=>f());tick()}
@@ -536,27 +536,27 @@ function pageHome(){
   const yl=S.lbn.filter(M=>M.m.startsWith(String(y))).map(M=>lbnCalc(M.m)),neonN=sum(yl,c=>c.n),neonCA=sum(yl,c=>c.ca),hours=sum(S.sessions.filter(x=>x.d.startsWith(String(y))),sessH);
   const cl={};S.invoices.filter(i=>i.m.startsWith(String(y))).forEach(i=>cl[i.client]=(cl[i.client]||0)+invHT(i));const top=Object.entries(cl).sort((a,b)=>b[1]-a[1]).slice(0,6),topMax=top.length?top[0][1]:1;
   const tvaOn=(P.tva||[]).some(p=>p.from.startsWith(String(y))||p.from<`${y}-01`);
-  mount(()=>{const el=$('#caBars');if(el)bars(el,caItems(periodMonths(UI.period)),{aria:'CA HT par mois',tip:caTip})});
+  mount(()=>{const el=$('#caBars');if(el)bars(el,caItems(periodMonths(UI.period)),{aria:isNet()?'Net par mois':'CA HT par mois',tip:caTip})});
   return `
   <div class="card">
-    <div class="row"><span class="label">Chiffre d’affaires HT</span><div class="seg"><button data-act="yearPrev">‹</button><button class="on">${y}</button><button data-act="yearNext" ${y>=new Date().getFullYear()?'disabled style="opacity:.3"':''}>›</button></div></div>
-    <div class="big">${eur(Y.ht,0)}</div>
-    <div class="split"><span>Net après URSSAF<b>${eur(Y.net,0)}</b></span><span>URSSAF<b>${eur(Y.ur,0)}</b></span>${Y.tva?`<span>TVA collectée<b>${eur(Y.tva,0)}</b></span>`:''}</div>
+    <div class="row"><span class="label">Ton net ${y} · après URSSAF</span><div class="seg"><button data-act="yearPrev">‹</button><button class="on">${y}</button><button data-act="yearNext" ${y>=new Date().getFullYear()?'disabled style="opacity:.3"':''}>›</button></div></div>
+    <div class="big" style="color:var(--accent)">${eur(Y.net,0)}</div>
+    <div class="split"><span>CA HT<b>${eur(Y.ht,0)}</b></span><span>URSSAF<b>−${eur(Y.ur,0)}</b></span><span>Net moyen<b>${eur(Y.rows.filter(r=>r.ht>0).length?Y.net/Y.rows.filter(r=>r.ht>0).length:0,0)}/mois</b></span>${Y.tva?`<span>TVA collectée<b>${eur(Y.tva,0)}</b></span>`:''}</div>
     <div class="split" style="margin-top:8px"><span><span class="sw" style="background:${SERIES[0]}"></span>Néon<b>${eur(Y.lbn,0)}</b></span><span><span class="sw" style="background:${SERIES[1]}"></span>Autres prestations<b>${eur(Y.ht-Y.lbn,0)}</b></span></div>
   </div>
   <div class="sec" style="margin-top:18px"><h2>À faire</h2></div>
   <div class="card">${todo.length?todo.map(t=>`<div class="todo"><span class="e">${t.e}</span><span>${t.t}</span>${t.a||''}</div>`).join(''):'<div class="todo"><span class="e">✅</span><span><b>Tout est à jour.</b> Rien à déclarer ni à envoyer.</span></div>'}</div>
   <div class="sec"><h2>${mNameC(mk())}</h2><span class="faint small">en cours</span></div>
   <div class="grid2">
+    <div class="tile"><div class="label">Net à date</div><div class="v" style="color:var(--accent)">${eur(cur.net,0)}</div><div class="s">après ${NFx.format(urssafRate(mk()))} % URSSAF</div></div>
     <div class="tile" data-act="tab" data-v="factures"><div class="label">CA HT du mois</div><div class="v">${eur(cur.ht,0)}</div><div class="s">dont néon ${eur(cur.lbn,0)}</div></div>
-    <div class="tile"><div class="label">Net estimé</div><div class="v">${eur(cur.net,0)}</div><div class="s">après ${NFx.format(urssafRate(mk()))} % URSSAF</div></div>
     <div class="tile" data-act="tab" data-v="atelier"><div class="label">Atelier</div><div class="v">${hTxt(lc.h)}</div><div class="s">${lc.days} jour${lc.days>1?'s':''} · ${eur(lc.atelier,0)}</div></div>
     <div class="tile" data-act="tab" data-v="neon"><div class="label">Néons vendus</div><div class="v">${lc.n}</div><div class="s">${eur(lc.ca,0)} HT vendus</div></div>
   </div>
   ${P.goalNet>0?`<div class="card"><div class="goal"><div class="rw">${ring(cur.net/P.goalNet)}<div class="rp">${NF0.format(Math.min(999,cur.net/P.goalNet*100))}%</div></div><div><div class="label">Objectif ${eur(P.goalNet,0)} net / mois</div><div class="mid">${cur.net>=P.goalNet?'Atteint 🎉':eur(P.goalNet-cur.net,0)}</div><div class="muted small">${cur.net>=P.goalNet?'Bravo !':'restant à aller chercher ce mois-ci'}</div></div></div></div>`:''}
-  <div class="sec"><h2>CA HT par mois</h2><button class="link" data-act="tab" data-v="stats">Toutes les stats</button></div>
+  <div class="sec"><h2>${isNet()?'Net par mois':'CA HT par mois'}</h2>${metricSeg()}</div>
   ${periodSeg()}
-  <div class="card"><div class="row small"><span class="muted">${periodLabel(UI.period)}</span><b>${eur(sum(periodMonths(UI.period),m=>monthStats(m).ht),0)} HT</b></div><div class="chart" id="caBars"></div><div class="legend" style="margin-top:4px"><div class="lg" style="grid-template-columns:auto 1fr auto auto"><span class="sw" style="background:${SERIES[0]};margin:0"></span><span>La Boîte à Néon</span><span></span><span></span></div><div class="lg" style="grid-template-columns:auto 1fr auto auto"><span class="sw" style="background:${SERIES[1]};margin:0"></span><span>Autres prestations</span><span></span><span></span></div></div></div>
+  <div class="card"><div class="row small"><span class="muted">${periodLabel(UI.period)}</span><b>${eur(sum(periodMonths(UI.period),m=>MV(monthStats(m))),0)} ${isNet()?'net':'HT'}</b></div><div class="chart" id="caBars"></div><div class="legend" style="margin-top:4px"><div class="lg" style="grid-template-columns:auto 1fr auto auto"><span class="sw" style="background:${SERIES[0]};margin:0"></span><span>La Boîte à Néon</span><span></span><span></span></div><div class="lg" style="grid-template-columns:auto 1fr auto auto"><span class="sw" style="background:${SERIES[1]};margin:0"></span><span>Autres prestations</span><span></span><span></span></div></div></div>
   <div class="sec"><h2>Plafonds ${y}</h2></div>
   <div class="card">
     <div class="row small"><span class="muted">Plafond micro (services)</span><span><b>${eur(Y.ht,0)}</b> <span class="faint">/ ${eur(P.plafond,0)}</span></span></div>
@@ -605,7 +605,7 @@ function pageNeon(){
   <div class="card">
     <div class="row"><span class="label">À facturer à LBN</span>${inv?tag(inv):''}</div>
     <div class="big">${eur(ht)}</div>
-    <div><span class="pill">${rate>0?`TTC ${eur(ht*(1+rate/100))}`:'TVA non applicable'}</span>${prev.total>0?` <span class="muted small">${mShort(addM(UI.m,-1))} : ${eur(prev.total,0)}</span>`:''}</div>
+    <div><span class="pill" style="color:var(--accent)">≈ ${eur(ht*(1-urssafRate(UI.m)/100),0)} net pour toi</span> <span class="pill">${rate>0?`TTC ${eur(ht*(1+rate/100))}`:'TVA non applicable'}</span>${prev.total>0?` <span class="muted small">${mShort(addM(UI.m,-1))} : ${eur(prev.total,0)}</span>`:''}</div>
     <div class="split"><span>CA vendu<b>${eur(c.ca,0)}</b></span><span>Néons<b>${c.n}</b></span><span>Panier<b>${eur(c.n?c.ca/c.n:0,0)}</b></span></div>
     <div class="stack" role="img" aria-label="Composition">${c.total>0?parts.filter(p=>p.v>0).map(p=>`<i style="width:${p.v/c.total*100}%;background:${p.col}"></i>`).join(''):''}</div>
     <div class="legend" style="margin-top:6px">${parts.map(p=>`<div class="lg"><span class="sw" style="background:${p.col};margin:0"></span><span>${p.k} <span class="faint tiny">${p.d}</span></span><span class="p">${c.total?pct(p.v/c.total,0):'—'}</span><span class="vv">${eur(p.v)}</span></div>`).join('')}</div>
@@ -643,7 +643,7 @@ function pageFactures(){
   </div>
   <button class="btn" data-act="newInv">+ Nouvelle prestation</button>
   <div style="margin-top:14px;text-align:center"><div class="seg">${[['all','Toutes'],['draft','À envoyer'],['unpaid','À encaisser']].map(([k,l])=>`<button data-act="filter" data-v="${k}" class="${UI.filter===k?'on':''}">${l}</button>`).join('')}</div></div>
-  ${shown.map(m=>{const list=inv.filter(i=>i.m===m).sort((a,b)=>isLbnInv(b)-isLbnInv(a));return `<div class="mhead"><b>${mName(m)}</b><span class="faint small">${eur(sum(list,invHT),0)} HT</span></div><div class="card" style="padding:12px 16px">${list.map(i=>`<div class="inv" data-act="openInv" data-id="${i.id}"><div style="min-width:0"><div class="c">${esc(i.client)}</div><div class="l">${i.number?esc(i.number)+' · ':''}${esc((invLines(i)[0]||{}).label||'')}</div></div><div class="v">${eur(invHT(i))}<div style="margin-top:3px">${tag(i)}</div></div></div>`).join('')}</div>`}).join('')||'<div class="cta" style="margin-top:14px">Aucune facture ici.</div>'}
+  ${shown.map(m=>{const list=inv.filter(i=>i.m===m).sort((a,b)=>isLbnInv(b)-isLbnInv(a));const msx=monthStats(m);return `<div class="mhead"><b>${mName(m)}</b><span class="faint small">${eur(msx.ht,0)} HT · <b style="color:var(--accent)">${eur(msx.net,0)} net</b></span></div><div class="card" style="padding:12px 16px">${list.map(i=>`<div class="inv" data-act="openInv" data-id="${i.id}"><div style="min-width:0"><div class="c">${esc(i.client)}</div><div class="l">${i.number?esc(i.number)+' · ':''}${esc((invLines(i)[0]||{}).label||'')}</div></div><div class="v">${eur(invHT(i))}<div style="margin-top:3px">${tag(i)}</div></div></div>`).join('')}</div>`}).join('')||'<div class="cta" style="margin-top:14px">Aucune facture ici.</div>'}
   ${UI.filter==='all'&&ms.length>shown.length?`<button class="more" data-act="moreInv">Afficher les mois précédents</button>`:''}`;
 }
 
@@ -658,8 +658,12 @@ function neonMonth(m){const c=lbnCalc(m),cnt=c.M.sales.length;return {m,n:c.n,cn
 const median=a=>{if(!a.length)return 0;const b=a.slice().sort((x,y)=>x-y),k=Math.floor(b.length/2);return b.length%2?b[k]:(b[k-1]+b[k])/2};
 const evo=(a,b)=>b>0?(a-b)/b:null;
 const evoTxt=v=>v==null?'—':`<span class="${v>=0?'up':'down'}">${v>=0?'▲':'▼'} ${pct(Math.abs(v),0)}</span>`;
-function caItems(ms){const n=ms.length;return ms.map(m=>{const st=monthStats(m);return {m,l:mLab(m,n),cur:m===mk(),s:st,parts:[{v:st.lbn,color:SERIES[0]},{v:st.other,color:SERIES[1]}]}})}
-const caTip=d=>`${mNameC(d.m)}<br><b>${eur(d.s.ht,0)} HT</b><div class="k"><span class="sw" style="background:${SERIES[0]};margin:0"></span>Néon ${eur(d.s.lbn,0)}</div><div class="k"><span class="sw" style="background:${SERIES[1]};margin:0"></span>Autres ${eur(d.s.other,0)}</div>Net ≈ ${eur(d.s.net,0)}`;
+const isNet=()=>UI.metric==='net';
+const MV=st=>isNet()?st.net:st.ht;
+const metricSeg=()=>`<div class="seg"><button data-act="metric" data-v="net" class="${isNet()?'on':''}">Net</button><button data-act="metric" data-v="ht" class="${isNet()?'':'on'}">CA HT</button></div>`;
+function caItems(ms){const n=ms.length;return ms.map(m=>{const st=monthStats(m),k=isNet()?1-urssafRate(m)/100:1;return {m,l:mLab(m,n),cur:m===mk(),s:st,parts:[{v:st.lbn*k,color:SERIES[0]},{v:st.other*k,color:SERIES[1]}]}})}
+function netTable(ms){const rows=ms.slice().reverse().map(m=>({m,...monthStats(m)})).filter(r=>r.ht>0);return `<div class="card" style="padding:12px 16px"><div class="mrow" style="grid-template-columns:1fr 1fr 1fr 1fr;font-size:11px;color:var(--muted);font-weight:650;padding-top:0"><span>MOIS</span><span style="text-align:right">CA HT</span><span style="text-align:right">URSSAF</span><span style="text-align:right">NET</span></div>${rows.map(r=>`<div class="mrow" style="grid-template-columns:1fr 1fr 1fr 1fr;font-size:14px"><span style="font-weight:650">${mShort(r.m)}${r.m===mk()?' <span class="faint tiny">en cours</span>':''}</span><span style="text-align:right" class="muted">${eur(r.ht,0)}</span><span style="text-align:right" class="muted">−${eur(r.ur,0)}</span><b style="text-align:right;color:var(--accent)">${eur(r.net,0)}</b></div>`).join('')||'<div class="muted small">Aucune donnée sur cette période.</div>'}${rows.length?`<div class="mrow" style="grid-template-columns:1fr 1fr 1fr 1fr;font-size:14px;border-top:1px solid rgba(255,255,255,.18)"><b>Total</b><b style="text-align:right">${eur(sum(rows,r=>r.ht),0)}</b><b style="text-align:right">−${eur(sum(rows,r=>r.ur),0)}</b><b style="text-align:right;color:var(--accent)">${eur(sum(rows,r=>r.net),0)}</b></div>`:''}</div>`}
+const caTip=d=>`${mNameC(d.m)}<br><b>${eur(d.s.net,0)} net</b> <span class="faint">· ${eur(d.s.ht,0)} HT</span><div class="k"><span class="sw" style="background:${SERIES[0]};margin:0"></span>Néon ${eur(d.s.lbn,0)}</div><div class="k"><span class="sw" style="background:${SERIES[1]};margin:0"></span>Autres ${eur(d.s.other,0)}</div>Net ≈ ${eur(d.s.net,0)}`;
 function forecast(){
   const cur=mk(),done=allMonths().filter(m=>m<cur),last3=done.slice(-3),prev3=done.slice(-6,-3);
   const avg3=last3.length?sum(last3,m=>monthStats(m).ht)/last3.length:0,avgP=prev3.length?sum(prev3,m=>monthStats(m).ht)/prev3.length:0;
@@ -676,8 +680,8 @@ function forecast(){
 }
 function pageStats(){
   const ms=periodMonths(UI.period),n=ms.length,rows=ms.map(m=>({m,...monthStats(m)})),act=rows.filter(r=>r.ht>0);
-  const tot=sum(rows,r=>r.ht),net=sum(rows,r=>r.net),best=act.reduce((a,r)=>!a||r.ht>a.ht?r:a,null),worst=act.filter(r=>r.m<mk()).reduce((a,r)=>!a||r.ht<a.ht?r:a,null);
-  const prevMs=ms.map(m=>addM(m,-n)),prevTot=sum(prevMs,m=>monthStats(m).ht);
+  const tot=sum(rows,r=>MV(r)),ht=sum(rows,r=>r.ht),ur=sum(rows,r=>r.ur),net=sum(rows,r=>r.net),best=act.reduce((a,r)=>!a||MV(r)>MV(a)?r:a,null),worst=act.filter(r=>r.m<mk()).reduce((a,r)=>!a||MV(r)<MV(a)?r:a,null);
+  const prevMs=ms.map(m=>addM(m,-n)),prevTot=sum(prevMs,m=>MV(monthStats(m)));
   const F=forecast(),G=S.settings.goalNet||0;
   const nm=ms.map(neonMonth),na=nm.filter(x=>x.cnt>0),N=sum(nm,x=>x.n),CNT=sum(nm,x=>x.cnt),CA=sum(nm,x=>x.ca),COM=sum(nm,x=>x.com),H=sum(nm,x=>x.h),ATL=sum(nm,x=>x.atelier);
   const allSales=ms.flatMap(m=>(lbnM(m)||{sales:[]}).sales.map(x=>+x.amount||0)),maxSale=allSales.length?Math.max(...allSales):0;
@@ -688,32 +692,34 @@ function pageStats(){
   const lcur=lbnCalc(mk()),day=new Date().getDate(),dim=daysIn(mk()),neonProj=day<dim?lcur.n*dim/day:lcur.n;
   const doneNeon=allMonths().filter(m=>m<mk()).slice(-3).map(neonMonth),avgNeon3=doneNeon.length?sum(doneNeon,x=>x.n)/doneNeon.length:0;
   mount(()=>{
-    const e1=$('#stCA');if(e1)bars(e1,caItems(ms),{aria:'CA HT par mois',ref:act.length?tot/n:null,refLabel:'moy. '+short(tot/n),tip:caTip});
+    const e1=$('#stCA');if(e1)bars(e1,caItems(ms),{aria:isNet()?'Net par mois':'CA HT par mois',ref:act.length?tot/n:null,refLabel:'moy. '+short(tot/n),tip:caTip});
     const e2=$('#stNeon');if(e2)bars(e2,nm.map(x=>({...x,l:mLab(x.m,n),cur:x.m===mk(),parts:[{v:x.n,color:'#8fd16a'}]})),{aria:'Néons vendus par mois',tip:d=>`${mNameC(d.m)}<br><b>${d.n} néon${d.n>1?'s':''}</b><br>${eur(d.ca,0)} HT vendus`});
     const e3=$('#stAvg');if(e3&&na.length>=2)lineChart(e3,na.map(x=>mShort(x.m)),[{name:'Panier moyen',color:SERIES[0],values:na.map(x=>x.avg)},{name:'Moyenne',color:'#8a8a84',values:na.map(()=>CNT?CA/CNT:0),dash:true}],{h:170,endDot:true,xticks:Math.min(4,na.length),aria:'Panier moyen par mois',tip:i=>`${mNameC(na[i].m)}<br><b>${eur(na[i].avg,0)}</b> / vente<br>${na[i].cnt} ventes`});
     else if(e3)e3.innerHTML='<div class="empty-chart">Pas assez de mois avec des ventes sur cette période.</div>';
     const e4=$('#stH');if(e4)bars(e4,nm.map(x=>({...x,l:mLab(x.m,n),cur:x.m===mk(),parts:[{v:x.h,color:SERIES[1]}]})),{aria:'Heures d’atelier par mois',tip:d=>`${mNameC(d.m)}<br><b>${hTxt(d.h)}</b><br>${d.days} jours`});
   });
-  return `${periodSeg()}
+  return `<div class="row" style="margin-bottom:10px"><span class="faint small">Afficher en</span>${metricSeg()}</div>${periodSeg()}
   <div class="card">
-    <div class="label">CA HT · ${periodLabel(UI.period)}</div>
-    <div class="big">${eur(tot,0)}</div>
+    <div class="label">${isNet()?'Net après URSSAF':'CA HT'} · ${periodLabel(UI.period)}</div>
+    <div class="big"${isNet()?' style="color:var(--accent)"':''}>${eur(tot,0)}</div>
     <div>${prevTot>0?`<span class="pill">${evoTxt(evo(tot,prevTot))}</span> <span class="muted small">vs ${n} mois précédents (${eur(prevTot,0)})</span>`:''}</div>
-    <div class="split"><span>Net<b>${eur(net,0)}</b></span><span>Moyenne<b>${eur(n?tot/n:0,0)}/mois</b></span><span>Médiane<b>${eur(median(act.map(r=>r.ht)),0)}</b></span></div>
+    <div class="split">${isNet()?`<span>CA HT<b>${eur(ht,0)}</b></span><span>URSSAF<b>−${eur(ur,0)}</b></span>`:`<span>Net<b>${eur(net,0)}</b></span>`}<span>Moyenne<b>${eur(n?tot/n:0,0)}/mois</b></span><span>Médiane<b>${eur(median(act.map(r=>MV(r))),0)}</b></span></div>
     <div class="chart" id="stCA"></div>
     <div class="legend" style="margin-top:4px"><div class="lg" style="grid-template-columns:auto 1fr auto"><span class="sw" style="background:${SERIES[0]};margin:0"></span><span>Néon</span><b>${eur(sum(rows,r=>r.lbn),0)}</b></div><div class="lg" style="grid-template-columns:auto 1fr auto"><span class="sw" style="background:${SERIES[1]};margin:0"></span><span>Autres prestations</span><b>${eur(sum(rows,r=>r.other),0)}</b></div></div>
   </div>
   <div class="grid2">
-    <div class="tile"><div class="label">🏆 Meilleur mois</div><div class="v">${best?eur(best.ht,0):'—'}</div><div class="s">${best?mNameC(best.m):''}</div></div>
-    <div class="tile"><div class="label">Mois le plus bas</div><div class="v">${worst?eur(worst.ht,0):'—'}</div><div class="s">${worst?mNameC(worst.m):''}</div></div>
-    <div class="tile"><div class="label">Net moyen</div><div class="v">${eur(n?net/n:0,0)}</div><div class="s">par mois</div></div>
+    <div class="tile"><div class="label">🏆 Meilleur mois</div><div class="v">${best?eur(MV(best),0):'—'}</div><div class="s">${best?mNameC(best.m):''}</div></div>
+    <div class="tile"><div class="label">Mois le plus bas</div><div class="v">${worst?eur(MV(worst),0):'—'}</div><div class="s">${worst?mNameC(worst.m):''}</div></div>
+    <div class="tile"><div class="label">Net moyen</div><div class="v" style="color:var(--accent)">${eur(act.length?net/act.length:0,0)}</div><div class="s">par mois travaillé</div></div>
     <div class="tile"><div class="label">Objectif net</div><div class="v">${G?`${rows.filter(r=>r.net>=G).length}/${n}`:'—'}</div><div class="s">${G?`mois ≥ ${eur(G,0)}`:'à définir dans Réglages'}</div></div>
   </div>
+  <div class="sec"><h2>Net mois par mois</h2><span class="faint small">${periodLabel(UI.period)}</span></div>
+  ${netTable(ms)}
   <div class="sec"><h2>Prévisions</h2><span class="faint small">au rythme actuel</span></div>
   <div class="card">
-    <div class="kv"><span>Rythme récent (moy. ${F.lastN} derniers mois)</span><b>${eur(F.avg3,0)}/mois</b></div>
+    <div class="kv"><span>Rythme récent (moy. ${F.lastN} derniers mois)</span><b>${eur(F.avg3*(1-urssafRate(mk())/100),0)} net/mois</b></div>
     <div class="kv"><span>Tendance vs 3 mois d’avant</span><b>${evoTxt(F.trend)}</b></div>
-    <div class="kv"><span>${mNameC(mk())} estimé</span><b>≈ ${eur(F.curProj,0)} HT</b></div>
+    <div class="kv"><span>${mNameC(mk())} estimé</span><b>≈ ${eur(F.curProj*(1-urssafRate(mk())/100),0)} net <span class="faint" style="font-weight:500">(${eur(F.curProj,0)} HT)</span></b></div>
     ${F.lyHT>0?`<div class="kv"><span>${mNameC(F.ly)} (l’an dernier)</span><b>${eur(F.lyHT,0)} · ${evoTxt(evo(F.curProj,F.lyHT))}</b></div>`:''}
     <div class="hr" style="margin:10px 0"></div>
     <div class="kv"><span>CA ${F.y} projeté</span><b>≈ ${eur(F.yearProj,0)} HT</b></div>
@@ -878,6 +884,7 @@ const ACT={
   prevM:()=>{UI.m=addM(UI.m,-1);UI.showSales=false;render()},nextM:()=>{if(UI.m<mk()){UI.m=addM(UI.m,1);UI.showSales=false;render()}},
   yearPrev:()=>{UI.year--;render()},yearNext:()=>{if(UI.year<new Date().getFullYear()){UI.year++;render()}},
   period:(id,el)=>{UI.period=el.dataset.v;render()},
+  metric:(id,el)=>{UI.metric=el.dataset.v;render()},
   openNeonM:(id,el)=>{UI.m=el.dataset.v;UI.tab='neon';render();window.scrollTo(0,0)},
   filter:(id,el)=>{UI.filter=el.dataset.v;UI.tab='factures';render()},goUnpaid:()=>{UI.filter='unpaid';UI.tab='factures';render();window.scrollTo(0,0)},moreInv:()=>{UI.invLimit+=6;render()},
   toggleSales:()=>{UI.showSales=!UI.showSales;render()},
