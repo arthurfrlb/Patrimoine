@@ -212,6 +212,25 @@ svg text{fill:var(--muted);font-size:10.5px;font-family:inherit}
 .switch input:checked+span:before{transform:translateX(20px)}
 .prow{display:grid;grid-template-columns:1fr 1fr 34px;gap:8px;align-items:center;margin-bottom:8px}
 .prow input{width:100%;height:46px;border-radius:12px;border:1px solid transparent;background:var(--card2);color:var(--text);font-size:16px;padding:0 10px;outline:none;font-family:inherit}
+
+/* ===== PC : barre latérale, contenu large, fenêtres centrées ===== */
+@media (min-width:900px){
+  html.desk body{padding-left:228px}
+  html.desk .tabbar{top:0;bottom:0;left:0;right:auto;width:228px;flex-direction:column;justify-content:flex-start;gap:4px;padding:26px 14px;border-top:0;border-right:1px solid var(--line);background:#0e0e0f;backdrop-filter:none;-webkit-backdrop-filter:none}
+  html.desk .tabbar::before{content:attr(data-brand);display:block;font-size:19px;font-weight:750;letter-spacing:-.02em;color:var(--text);padding:0 12px 20px}
+  html.desk .tabbar button{flex:0 0 auto;flex-direction:row;justify-content:flex-start;gap:12px;font-size:14.5px;padding:11px 12px;border-radius:12px;color:var(--text2)}
+  html.desk .tabbar button:hover{background:rgba(255,255,255,.05)}
+  html.desk .tabbar button.on{background:rgba(143,209,106,.12);color:var(--accent)}
+  html.desk .tabbar button svg{width:20px;height:20px}
+  html.desk .top{max-width:980px;padding:26px 32px 14px}
+  html.desk #view{max-width:980px;padding:2px 32px 60px}
+  html.desk .panel{top:50%;bottom:auto;left:50%;right:auto;width:min(680px,92vw);max-height:88vh;margin:0;border-radius:22px;border-bottom:1px solid var(--line);padding:10px 28px 28px;transform:translate(-50%,-47%) scale(.98);opacity:0;transition:transform .2s ease,opacity .2s ease}
+  html.desk .open .panel{transform:translate(-50%,-50%);opacity:1}
+  html.desk .grab{display:none}
+  html.desk #toast{bottom:28px;left:calc(50% + 114px)}
+  html.desk .tile,html.desk .inv,html.desk .mrow[data-act],html.desk [data-act]{cursor:pointer}
+  html.desk ::-webkit-scrollbar{width:10px;height:10px}html.desk ::-webkit-scrollbar-thumb{background:#2a2a2c;border-radius:10px}
+}
 </style>
 </head>
 <body>
@@ -222,7 +241,7 @@ svg text{fill:var(--muted);font-size:10.5px;font-family:inherit}
   </button>
 </header>
 <main id="view"></main>
-<nav class="tabbar">
+<nav class="tabbar" data-brand="Ma Micro">
   <button data-tab="home"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Accueil</button>
   <button data-tab="atelier"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg>Atelier</button>
   <button data-tab="neon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg>Néon</button>
@@ -285,7 +304,7 @@ function seed(){return {v:1,app:'ma-micro',profile:{name:'',company:'',siret:'',
   lbn:[],sessions:[],invoices:[],timer:null}}
 let S;
 function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&o.app==='ma-micro')return o}}catch(e){}return null}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('Impossible d’enregistrer sur ce téléphone')}}
+function save(){syStamp();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('Impossible d’enregistrer sur ce téléphone')}}
 function normalize(){const d=seed();S.profile={...d.profile,...(S.profile||{})};S.settings={...d.settings,...(S.settings||{})};S.settings.lbnRules={...d.settings.lbnRules,...(S.settings.lbnRules||{})};S.clients=S.clients||{[LBN]:{}};S.lbn=S.lbn||[];S.sessions=S.sessions||[];S.invoices=S.invoices||[];S.settings.declared=S.settings.declared||{}}
 
 const periodVal=(arr,m,def)=>{let v=def;(arr||[]).slice().sort((a,b)=>a.from<b.from?-1:1).forEach(p=>{if(p.from<=m)v=+p.rate});return v};
@@ -444,6 +463,7 @@ function recapPDF(m){
 }
 async function sharePDF(o){
   const file=new File([o.bytes],o.name,{type:'application/pdf'});
+  if(DESK){if(window.showSaveFilePicker){try{const h=await showSaveFilePicker({suggestedName:o.name,id:'factures',types:[{description:'PDF',accept:{'application/pdf':['.pdf']}}]});const w=await h.createWritable();await w.write(file);await w.close();toast('PDF enregistré ✓');return}catch(e){if(e.name==='AbortError')return}}return dl(file,o.name)}
   try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:o.name});return}}catch(e){if(e.name==='AbortError')return}
   const url=URL.createObjectURL(file),a=document.createElement('a');a.href=url;a.download=o.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
 }
@@ -644,8 +664,25 @@ function pageFactures(){
   <button class="btn" data-act="newInv">+ Nouvelle prestation</button>
   <div style="margin-top:14px;text-align:center"><div class="seg">${[['all','Toutes'],['draft','À envoyer'],['unpaid','À encaisser']].map(([k,l])=>`<button data-act="filter" data-v="${k}" class="${UI.filter===k?'on':''}">${l}</button>`).join('')}</div></div>
   ${shown.map(m=>{const list=inv.filter(i=>i.m===m).sort((a,b)=>isLbnInv(b)-isLbnInv(a));const msx=monthStats(m);return `<div class="mhead"><b>${mName(m)}</b><span class="faint small">${eur(msx.ht,0)} HT · <b style="color:var(--accent)">${eur(msx.net,0)} net</b></span></div><div class="card" style="padding:12px 16px">${list.map(i=>`<div class="inv" data-act="openInv" data-id="${i.id}"><div style="min-width:0"><div class="c">${esc(i.client)}</div><div class="l">${i.number?esc(i.number)+' · ':''}${esc((invLines(i)[0]||{}).label||'')}</div></div><div class="v">${eur(invHT(i))}<div style="margin-top:3px">${tag(i)}</div></div></div>`).join('')}</div>`}).join('')||'<div class="cta" style="margin-top:14px">Aucune facture ici.</div>'}
-  ${UI.filter==='all'&&ms.length>shown.length?`<button class="more" data-act="moreInv">Afficher les mois précédents</button>`:''}`;
+  ${UI.filter==='all'&&ms.length>shown.length?`<button class="more" data-act="moreInv">Afficher les mois précédents</button>`:''}
+  ${UI.filter==='all'?comptaCard():''}`;
 }
+function comptaCard(){const ys=[...new Set(S.invoices.filter(i=>i.sent).map(i=>i.m.slice(0,4)))].sort().reverse();if(!ys.length)return '';const y=ys.includes(UI.cy)?UI.cy:ys[0];
+  return `<div class="mhead"><b style="text-transform:none">Pour ta compta</b></div><div class="card">
+  ${ys.length>1?`<div style="margin-bottom:12px"><div class="seg">${ys.map(v=>`<button data-act="cy" data-v="${v}" class="${v===y?'on':''}">${v}</button>`).join('')}</div></div>`:''}
+  <div class="muted small" style="margin-bottom:12px">Le livre des recettes est obligatoire en micro-entreprise : la liste de tes encaissements avec leur date et le mode de paiement. Il s'ouvre dans Excel.</div>
+  <div class="btns" style="flex-wrap:wrap"><button class="btn ghost sm" data-act="livre" data-v="${y}">Livre des recettes ${y}</button>${FSA&&window.showDirectoryPicker?`<button class="btn ghost sm" data-act="allPdf" data-v="${y}">Toutes les factures ${y} en PDF</button>`:''}</div></div>`}
+function livreCSV(y){
+  const rows=S.invoices.filter(i=>i.sent&&i.paid).map(i=>({i,d:i.paidAt||i.sentAt||iso(new Date(+i.m.slice(0,4),+i.m.slice(5),0))})).filter(x=>x.d.slice(0,4)===y).sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:0);
+  const f=v=>r2(v).toFixed(2).replace('.',','),q=v=>`"${String(v??'').replace(/"/g,'""')}"`;
+  const out=[["Date d'encaissement",'N° de facture','Client','Nature de la prestation','Montant HT','TVA','Montant TTC','Mode de règlement'],
+    ...rows.map(({i,d})=>[frDate(d),i.number||'',clientInfo(i.client).legalName||i.client,(invLines(i)[0]||{}).label||'Prestation de services',f(invHT(i)),f(invTVA(i)),f(invTTC(i)),'Virement']),
+    ['','','','Total '+y,f(sum(rows,x=>invHT(x.i))),f(sum(rows,x=>invTVA(x.i))),f(sum(rows,x=>invTTC(x.i))),'']];
+  if(!rows.length)return toast('Aucune facture encaissée en '+y);
+  dl(new Blob(['\ufeff'+out.map(r=>r.map(q).join(';')).join('\r\n')],{type:'text/csv;charset=utf-8'}),`Livre-des-recettes-${y}.csv`);toast('Livre des recettes '+y+' ✓')}
+async function allPdf(y){try{const dir=await showDirectoryPicker({id:'factures',mode:'readwrite'});const list=S.invoices.filter(i=>i.sent&&i.number&&i.m.slice(0,4)===y);let n=0;
+  for(const i of list){const o=invoicePDF(i),fh=await dir.getFileHandle(o.name,{create:true}),w=await fh.createWritable();await w.write(new Blob([o.bytes],{type:'application/pdf'}));await w.close();n++}
+  toast(`${n} facture${n>1?'s':''} enregistrée${n>1?'s':''} ✓`)}catch(e){if(e.name!=='AbortError')toast('Enregistrement impossible')}}
 
 /* ============ STATS ============ */
 function allMonths(){const ms=[...S.invoices.map(i=>i.m),...S.lbn.filter(M=>M.sales.length).map(M=>M.m),...S.sessions.map(x=>x.d.slice(0,7))].sort();const first=ms[0]||mk(),out=[];for(let m=first;m<=mk();m=addM(m,1))out.push(m);return out}
@@ -771,6 +808,118 @@ const nv=v=>v==null||v===''?'':String(v).replace('.',',');
 const field=(label,name,val='',type='text',extra='',cls='')=>`<label class="field ${cls}"><span>${label}</span><input name="${name}" type="${type}" ${/\bnum\b/.test(extra)?'inputmode="decimal"':''} value="${esc(val)}" ${extra.replace(/\bnum\b/,'')}></label>`;
 let toastT;function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('show'),2300)}
 function commit(msg){save();render();if(msg)toast(msg)}
+
+const BUILD='2026-11-16.1';
+const SYNC={file:'ma-micro-donnees',valid:o=>!!o&&o.app==='ma-micro',
+  colls:[['lbn',s=>s.lbn,'m',(s,a)=>{s.lbn=a}],['sessions',s=>s.sessions,'id',(s,a)=>{s.sessions=a}],['invoices',s=>s.invoices,'id',(s,a)=>{s.invoices=a}]],
+  singles:[['profile',s=>s.profile],['settings',s=>s.settings,f=>f!=='lastSync'],['clients',s=>s.clients],['root',s=>s,f=>f==='timer']],
+  post(R){const keep={},now=Date.now(),sc=x=>(x.sent?2:0)+(x.number?1:0);R.invoices.forEach(i=>{if(!i.lbn)return;const k=keep[i.lbn];if(!k||sc(i)>sc(k))keep[i.lbn]=i});
+    R.invoices=R.invoices.filter(i=>{if(!i.lbn||keep[i.lbn]===i)return true;R._sync.del['invoices|'+i.id]=now;return false});R.lbn.sort((a,b)=>a.m<b.m?-1:1)},
+  after(){normalize();UI.m=mk()}};
+/* ============ synchro iPhone ⇄ PC (fusion intelligente) ============ */
+const DESK=matchMedia('(hover:hover) and (pointer:fine)').matches;
+const FSA=DESK&&'showOpenFilePicker' in window;
+const SY={prev:null};
+function syFlat(s){const v=new Map(),items=new Set(),J=JSON.stringify;
+  SYNC.colls.forEach(([c,get,key])=>{(get(s)||[]).forEach(it=>{const k=it&&it[key];if(k==null)return;items.add(`${c}|${k}`);Object.keys(it).forEach(f=>v.set(`${c}|${k}|${f}`,J(it[f])))})});
+  SYNC.singles.forEach(([n,get,ok])=>{const o=get(s)||{};Object.keys(o).forEach(f=>{if(ok&&!ok(f))return;v.set(`@${n}|${f}`,J(o[f]))})});
+  return {v,items}}
+function syInit(){S._sync=S._sync||{};S._sync.f=S._sync.f||{};S._sync.del=S._sync.del||{};SY.prev=syFlat(S)}
+function syStamp(){if(!SY.prev)return;const cur=syFlat(S),now=Date.now(),st=S._sync;
+  cur.v.forEach((x,p)=>{if(SY.prev.v.get(p)!==x)st.f[p]=now});
+  SY.prev.items.forEach(k=>{if(!cur.items.has(k))st.del[k]=now});
+  cur.items.forEach(k=>{if(st.del[k]&&!SY.prev.items.has(k))delete st.del[k]});
+  SY.prev=cur}
+function syMerge(A,B){
+  const sa=A._sync||{},sb=B._sync||{},fA=sa.f||{},fB=sb.f||{},J=JSON.stringify;
+  const f={...fA};Object.entries(fB).forEach(([p,t])=>{if(t>(f[p]||0))f[p]=t});
+  const del={...(sa.del||{})};Object.entries(sb.del||{}).forEach(([p,t])=>{if(t>(del[p]||0))del[p]=t});
+  const R=JSON.parse(J(A));let changes=0;
+  SYNC.colls.forEach(([c,get,key,set])=>{
+    const a=get(A)||[],b=get(B)||[],ma=new Map(a.map(x=>[x[key],x])),mb=new Map(b.map(x=>[x[key],x]));
+    const keys=[...a.map(x=>x[key]),...b.map(x=>x[key]).filter(k=>!ma.has(k))],out=[];
+    keys.forEach(k=>{const x=ma.get(k),y=mb.get(k);let it;
+      if(x&&y){it=JSON.parse(J(x));new Set([...Object.keys(x),...Object.keys(y)]).forEach(fl=>{const p=`${c}|${k}|${fl}`;if(!(fl in y))return;if(!(fl in x)||(fB[p]||0)>(fA[p]||0)){if(J(it[fl])!==J(y[fl]))changes++;it[fl]=JSON.parse(J(y[fl]))}})}
+      else it=JSON.parse(J(x||y));
+      const last=Math.max(0,...Object.keys(it).map(fl=>f[`${c}|${k}|${fl}`]||0)),dt=del[`${c}|${k}`]||0;
+      if(dt&&dt>=last){if(x)changes++;return}
+      if(!x)changes++;out.push(it)});
+    set(R,out)});
+  SYNC.singles.forEach(([n,get,ok])=>{const a=get(A)||{},b=get(B)||{},r=get(R);if(!r)return;Object.keys(b).forEach(fl=>{if(ok&&!ok(fl))return;const p=`@${n}|${fl}`;if(!(fl in a)||(fB[p]||0)>(fA[p]||0)){if(J(r[fl])!==J(b[fl]))changes++;r[fl]=JSON.parse(J(b[fl]))}})});
+  R._sync={f,del};if(SYNC.post)SYNC.post(R,A,B);
+  return {R,changes}}
+function syApply(o,mode){
+  if(mode==='replace'){S=o}else{syStamp();const r=syMerge(S,o);S=r.R;SY.last=r.changes}
+  SYNC.after();syInit();save();render()}
+const syName=()=>`${SYNC.file}.json`;
+const syBlob=()=>new Blob([JSON.stringify(S,null,1)],{type:'application/json'});
+function syAskImport(o){
+  openSheet('Importer',`
+    <div class="muted small" style="margin:0 2px 14px">Fichier du ${o._sync&&Object.keys(o._sync.f||{}).length?new Date(Math.max(...Object.values(o._sync.f))).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'}):'(date inconnue)'}.</div>
+    <button class="btn" data-act="syMerge">Fusionner (recommandé)</button>
+    <div class="muted small" style="margin:8px 2px 16px">Garde tout ce qui est ici et ajoute ce qui est dans le fichier. En cas de modification des deux côtés, la plus récente gagne.</div>
+    <button class="btn ghost" data-act="syReplace">Remplacer tout</button>
+    <div class="muted small" style="margin:8px 2px 0">Efface ce qui est ici et met exactement le contenu du fichier.</div>`);
+  SY.pending=o}
+function syAfterMerge(){const n=SY.last||0;
+  if(DESK){toast(n?`Fusion réussie ✓ (${n} changement${n>1?'s':''})`:'Déjà à jour ✓');closeSheet();return}
+  openSheet('Fusion réussie ✓',`
+    <div class="muted" style="margin:0 2px 14px">${n?`${n} changement${n>1?'s':''} récupéré${n>1?'s':''}.`:'Rien de nouveau dans le fichier.'} Pour que ton PC ait aussi tes derniers changements, enregistre le fichier à jour par-dessus l'ancien.</div>
+    <button class="btn" data-act="export">Enregistrer le fichier à jour</button>
+    <div class="muted small" style="margin:8px 2px 0">Choisis « Enregistrer dans Fichiers », le même dossier iCloud Drive, puis « Remplacer ».</div>`)}
+async function syExport(){
+  const name=syName(),blob=syBlob();
+  if(FSA&&window.showSaveFilePicker){try{const h=await showSaveFilePicker({suggestedName:name,id:SYNC.file,types:[{description:'Données',accept:{'application/json':['.json']}}]});const w=await h.createWritable();await w.write(blob);await w.close();toast('Fichier enregistré ✓');return}catch(e){if(e.name==='AbortError')return}}
+  const file=new File([blob],name,{type:'application/json'});
+  if(!DESK){try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:name});closeSheet();return}}catch(e){if(e.name==='AbortError')return}}
+  dl(file,name)}
+function dl(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000)}
+async function syImportFile(file){try{const o=JSON.parse(await file.text());if(!SYNC.valid(o))throw 0;syAskImport(o)}catch(_){toast('Fichier invalide')}}
+/* PC : un clic = lire le fichier iCloud, fusionner, réécrire */
+const HDB={open(){return new Promise((res,rej)=>{const r=indexedDB.open('sync-handles',1);r.onupgradeneeded=()=>r.result.createObjectStore('h');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})},
+  async get(k){try{const db=await this.open();return await new Promise(res=>{const q=db.transaction('h').objectStore('h').get(k);q.onsuccess=()=>res(q.result||null);q.onerror=()=>res(null)})}catch(e){return null}},
+  async set(k,v){try{const db=await this.open();await new Promise(res=>{const q=db.transaction('h','readwrite').objectStore('h').put(v,k);q.onsuccess=q.onerror=()=>res()})}catch(e){}}};
+async function sySync(pick){
+  try{
+    let h=pick?null:await HDB.get(SYNC.file);
+    if(!h){[h]=await showOpenFilePicker({id:SYNC.file,types:[{description:'Données',accept:{'application/json':['.json']}}]});await HDB.set(SYNC.file,h)}
+    if((await h.queryPermission({mode:'readwrite'}))!=='granted'&&(await h.requestPermission({mode:'readwrite'}))!=='granted')return toast('Accès au fichier refusé');
+    const txt=(await (await h.getFile()).text()).trim();let o=null;
+    if(txt){try{o=JSON.parse(txt)}catch(e){return toast('Fichier illisible')}if(!SYNC.valid(o))return toast('Ce fichier ne vient pas de cette app')}
+    if(o)syApply(o,'merge');
+    const w=await h.createWritable();await w.write(syBlob());await w.close();
+    S.settings.lastSync=Date.now();save();render();
+    const n=SY.last||0;toast(o?(n?`Synchronisé ✓ (${n} changement${n>1?'s':''})`:'Synchronisé ✓ déjà à jour'):'Fichier créé ✓');SY.last=0;
+  }catch(e){if(e&&e.name==='AbortError')return;toast('Synchro impossible : '+(e&&e.message||e))}}
+async function syNewFile(){try{const h=await showSaveFilePicker({suggestedName:syName(),id:SYNC.file,types:[{description:'Données',accept:{'application/json':['.json']}}]});const w=await h.createWritable();await w.write(syBlob());await w.close();await HDB.set(SYNC.file,h);S.settings.lastSync=Date.now();save();render();toast('Fichier de synchro créé ✓')}catch(e){if(e.name!=='AbortError')toast('Impossible de créer le fichier')}}
+const syLast=()=>{const t=S.settings&&S.settings.lastSync;return t?new Date(t).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'}):'jamais'};
+function syBlock(){return FSA?`
+    <div class="sh-sub">Synchro iPhone ⇄ PC</div>
+    <div class="muted small" style="margin:0 2px 10px">Dernière synchro : ${syLast()}. Le fichier « ${syName()} » dans iCloud Drive fait le lien entre ton iPhone et ce PC.</div>
+    <button class="btn" data-act="sySync">Synchroniser maintenant</button>
+    <div class="btns" style="margin-top:10px"><button class="btn ghost sm" data-act="syPick">Choisir le fichier</button><button class="btn ghost sm" data-act="syNew">Créer le fichier</button></div>
+    <div class="btns" style="margin-top:10px"><button class="btn ghost sm" data-act="export">Exporter une copie</button><button class="btn ghost sm" data-act="import">Importer</button></div>`:`
+    <div class="sh-sub">Mes données · synchro avec le PC</div>
+    <div class="muted small" style="margin:0 2px 10px">Tout reste sur cet appareil. Pour synchroniser avec ton PC : <b>Importer</b> le fichier « ${syName()} » depuis iCloud Drive (fusion), puis <b>Exporter</b> par-dessus. Ça sert aussi de sauvegarde.</div>
+    <div class="btns"><button class="btn ghost sm" data-act="export">Exporter</button><button class="btn ghost sm" data-act="import">Importer</button></div>`}
+const SY_ACT={
+  export:()=>syExport(),
+  syMerge:()=>{const o=SY.pending;SY.pending=null;if(!o)return;syApply(o,'merge');syAfterMerge()},
+  syReplace:()=>{const o=SY.pending;if(!o)return;if(!confirm('Remplacer toutes tes données par ce fichier ?'))return;SY.pending=null;syApply(o,'replace');closeSheet();toast('Données remplacées ✓')},
+  sySync:()=>sySync(false),syPick:()=>sySync(true),syNew:()=>syNewFile()};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#sheet').hidden)closeSheet()});
+if(DESK)document.documentElement.classList.add('desk');
+
+/* ============ mise à jour automatique ============ */
+let lastChk=0;
+async function checkUpdate(manual){
+  const now=Date.now();if(!manual&&now-lastChk<60000)return;lastChk=now;
+  try{const r=await fetch(location.pathname+'?chk='+now,{cache:'no-store'});if(!r.ok)throw 0;const m=(await r.text()).match(/const BUILD='([^']+)'/);
+    if(m&&m[1]!==BUILD){save();toast('Mise à jour…');setTimeout(()=>location.replace(location.pathname+'?v='+encodeURIComponent(m[1])),600);return}
+    if(manual)toast('Tu as la dernière version ✓')}catch(e){if(manual)toast('Pas de connexion')}
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkUpdate()});
+
 const defDate=()=>UI.m===mk()?iso():`${UI.m}-${z(daysIn(UI.m))}`;
 
 /* session (journée d'atelier) */
@@ -869,10 +1018,11 @@ function openSettings(){
     <div class="f2">${field('Plafond micro (€)','plafond',nv(T.plafond),'text','num')}${field('Seuil TVA (€)','seuilTva',nv(T.seuilTva),'text','num')}</div>
     ${field('Seuil TVA majoré (€)','seuilTvaMaj',nv(T.seuilTvaMaj),'text','num')}
     <button class="btn" data-act="saveSettings">Enregistrer</button>
-    <div class="sh-sub">Mes données</div>
-    <div class="muted small" style="margin:0 2px 10px">Tout reste sur ce téléphone. Exporte une sauvegarde chaque mois (Enregistrer dans Fichiers → iCloud Drive).</div>
-    <div class="btns"><button class="btn ghost sm" data-act="export">Exporter</button><button class="btn ghost sm" data-act="import">Importer</button></div>
-    <button class="btn danger sm" data-act="reset" style="margin-top:10px">Tout effacer</button>`);
+    ${syBlock()}
+    <button class="btn danger sm" data-act="reset" style="margin-top:10px">Tout effacer</button>
+    <div class="sh-sub">Application</div>
+    <div class="muted small" style="margin:0 2px 10px">Version ${BUILD}. L'app vérifie toute seule les mises à jour à chaque ouverture.</div>
+    <button class="btn ghost sm" data-act="update">Vérifier les mises à jour</button>`);
 }
 const readPeriods=k=>$$(`#sheet [data-${k}]`).map(r=>({from:$('[data-k="from"]',r).value,rate:num($('[data-k="rate"]',r).value)})).filter(p=>/^\d{4}-\d{2}$/.test(p.from));
 
@@ -932,25 +1082,27 @@ const ACT={
     const T=S.settings;T.lbnRules={rate:num(fv$('rate')),avis:num(fv$('avis')),hourly:num(fv$('hourly'))};if($('#sheet [name="applyCur"]').checked)lbnM(mk(),true).rules={...T.lbnRules};
     T.round15=$('#sheet [name="round15"]').checked;T.urssaf=readPeriods('u');if(!T.urssaf.length)T.urssaf=[{from:'2025-01',rate:23}];T.tva=readPeriods('t');T.declare=fv$('declare');
     T.goalNet=num(fv$('goalNet'));T.plafond=num(fv$('plafond'))||83600;T.seuilTva=num(fv$('seuilTva'))||37500;T.seuilTvaMaj=num(fv$('seuilTvaMaj'))||41250;closeSheet();commit('Réglages enregistrés')},
+  update:()=>checkUpdate(true),cy:(_,el)=>{UI.cy=el.dataset.v;render()},livre:(_,el)=>livreCSV(el.dataset.v),allPdf:(_,el)=>allPdf(el.dataset.v),
   export:async()=>{const name=`ma-micro-${iso()}.json`,file=new File([JSON.stringify(S,null,1)],name,{type:'application/json'});try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'Sauvegarde Ma Micro'});return}}catch(e){if(e.name==='AbortError')return}const a=document.createElement('a');a.href=URL.createObjectURL(file);a.download=name;document.body.appendChild(a);a.click();a.remove()},
   import:()=>$('#importFile').click(),
   reset:()=>{if(!confirm('Effacer toutes tes données ? (fais d’abord une sauvegarde)'))return;if(!confirm('Vraiment tout effacer ?'))return;S=seed();closeSheet();commit('Données effacées')}
 };
 function freezeLbn(i){if(i&&i.lbn&&!i.sent)i.lines=lbnLines(i.lbn)}
+Object.assign(ACT,SY_ACT);
 document.addEventListener('click',e=>{
   const t=e.target.closest('[data-tab]');if(t&&t.closest('.tabbar')){UI.tab=t.dataset.tab;render();window.scrollTo(0,0);return}
   const a=e.target.closest('[data-act]');if(!a||a.matches('input,select,label,textarea'))return;
   const f=ACT[a.dataset.act];if(f){e.preventDefault();f(a.dataset.id,a,e)}
 });
-$('#importFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const o=JSON.parse(await f.text());if(!o||o.app!=='ma-micro')throw 0;if(!confirm('Remplacer tes données actuelles par ce fichier ?'))return;S=o;normalize();closeSheet();UI.m=mk();commit(`Import réussi ✓ (${S.invoices.length} factures, ${S.sessions.length} journées)`)}catch(_){toast('Fichier invalide')}e.target.value=''});
+$('#importFile').addEventListener('change',e=>{const f=e.target.files[0];if(f)syImportFile(f);e.target.value=''});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){render()}});
 
 (function init(){
-  S=load()||seed();normalize();ensureLbnInvoices();save();
+  S=load()||seed();normalize();ensureLbnInvoices();syInit();save();
   const d=new Date(),hs=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});$('#hello').textContent=hs.charAt(0).toUpperCase()+hs.slice(1);
   try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
   if(S.timer)UI.tab='atelier';
-  render();
+  render();checkUpdate();
   let rw=window.innerWidth,rt;window.addEventListener('resize',()=>{if(window.innerWidth===rw)return;rw=window.innerWidth;clearTimeout(rt);rt=setTimeout(render,150)});
 })();
 </script>
