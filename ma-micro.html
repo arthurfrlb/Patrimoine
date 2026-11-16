@@ -213,6 +213,7 @@ svg text{fill:var(--muted);font-size:10.5px;font-family:inherit}
 .prow{display:grid;grid-template-columns:1fr 1fr 34px;gap:8px;align-items:center;margin-bottom:8px}
 .prow input{width:100%;height:46px;border-radius:12px;border:1px solid transparent;background:var(--card2);color:var(--text);font-size:16px;padding:0 10px;outline:none;font-family:inherit}
 
+.promo-row .f2>*{min-width:0}.promo-row input{min-width:0;width:100%}
 /* ===== PC : barre latérale, contenu large, fenêtres centrées ===== */
 @media (min-width:900px){
   html.desk body{padding-left:228px}
@@ -300,7 +301,7 @@ const segTxt=x=>x.segs.filter(s=>s.s&&s.e).map(s=>`${s.s.replace(':','h')}–${s
 
 /* ============ données ============ */
 function seed(){return {v:1,app:'ma-micro',profile:{name:'',company:'',siret:'',address:'',email:'',phone:'',mentions:'',tvaNum:'',rne:'',payDays:30,debits:false,status:'Commerçant',bic:'',iban:''},clients:{[LBN]:{address:''}},
-  settings:{urssaf:[{from:'2025-01',rate:23}],tva:[],plafond:83600,seuilTva:37500,seuilTvaMaj:41250,round15:true,declare:'mensuelle',declared:{},goalNet:0,lbnRules:{rate:15,avis:10,hourly:17.12},prefix:'F',showTimes:false,attachSales:false},
+  settings:{urssaf:[{from:'2025-01',rate:23}],tva:[],promos:[],plafond:83600,seuilTva:37500,seuilTvaMaj:41250,round15:true,declare:'mensuelle',declared:{},goalNet:0,lbnRules:{rate:15,avis:10,hourly:17.12},prefix:'F',showTimes:false,attachSales:false},
   lbn:[],sessions:[],invoices:[],timer:null}}
 let S;
 function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&o.app==='ma-micro')return o}}catch(e){}return null}
@@ -313,13 +314,17 @@ const tvaRate=m=>periodVal(S.settings.tva,m,0);
 
 /* ---- néon ---- */
 function lbnM(m,create){let M=S.lbn.find(x=>x.m===m);if(!M&&create){M={m,sales:[],trust:0,google:0,bonus:0,companyCA:null,hoursAdj:0,rules:{...S.settings.lbnRules}};S.lbn.push(M);S.lbn.sort((a,b)=>a.m<b.m?-1:1)}return M}
+const promoOf=d=>{if(!d)return null;let f=null;(S.settings.promos||[]).forEach(p=>{if(p.from&&d>=p.from&&(!p.to||d<=p.to))f=p});return f};
+const autoRate=(d,M)=>{const p=promoOf(d);return p?+p.rate:+((M&&M.rules)||S.settings.lbnRules).rate};
+const saleRate=(s,M)=>s.rate!=null&&s.rate!==''?+s.rate:autoRate(s.d,M);
+const NFr=new Intl.NumberFormat('fr-FR',{maximumFractionDigits:2});
 const sessionsOf=m=>S.sessions.filter(x=>x.d.slice(0,7)===m).sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:0);
 function lbnCalc(m){
   const M=lbnM(m)||{m,sales:[],trust:0,google:0,bonus:0,hoursAdj:0,rules:S.settings.lbnRules},r=M.rules;
   const ss=sessionsOf(m),hLog=sum(ss,sessH),adj=+M.hoursAdj||0,h=hLog+adj;
   const ca=sum(M.sales,s=>s.amount),n=sum(M.sales,s=>s.qty||1);
-  const com=ca*r.rate/100,avisN=(+M.trust||0)+(+M.google||0),avis=avisN*r.avis,atelier=h*r.hourly,bonus=+M.bonus||0;
-  return {M,r,ss,hLog,adj,h,ca,n,com,avisN,avis,atelier,bonus,total:com+avis+atelier+bonus,days:ss.length};
+  const rates=[...new Set(M.sales.map(s=>saleRate(s,M)))].sort((a,b)=>a-b),com=sum(M.sales,s=>(+s.amount||0)*saleRate(s,M)/100),avisN=(+M.trust||0)+(+M.google||0),avis=avisN*r.avis,atelier=h*r.hourly,bonus=+M.bonus||0;
+  return {M,r,ss,hLog,adj,h,ca,n,com,rates,avisN,avis,atelier,bonus,total:com+avis+atelier+bonus,days:ss.length};
 }
 const lbnActive=m=>{const c=lbnCalc(m);return c.total>0||c.ss.length>0||c.M.sales.length>0};
 function lbnLines(m){const c=lbnCalc(m),mo=mName(m),com=r2(c.com+c.avis+c.bonus),fab=r2(c.atelier);return [
@@ -433,8 +438,8 @@ function lbnPDF(m){
   const p=invoiceDoc({number:sent?inv.number:null,emit:sent?(inv.sentAt||iso()):iso(),m,client:LBN,lines,rate});
   if(S.settings.attachSales&&c.M.sales.length){
     p.add();p.text(40,62,'Annexe',{size:22,bold:true});p.text(40,80,`Ventes suivies · ${mNameC(m)}${sent&&inv.number?' · facture '+inv.number:''}`,{size:10,color:GREY});
-    pdfTable(p,104,[{t:'N°',x:40,w:40},{t:'Date',x:80,w:80},{t:'Réalisation',x:160,w:180},{t:'Qté',x:340,w:45,align:'right'},{t:'CA HT',x:385,w:85,align:'right'},{t:`Commission ${NFx.format(c.r.rate)} %`,x:470,w:85,align:'right'}],
-      [...c.M.sales.map((s2,i)=>[String(i+1),s2.d?frDate(s2.d):'',s2.label||'Enseigne néon',String(s2.qty||1),eur(+s2.amount||0),eur((+s2.amount||0)*c.r.rate/100)]),['','','Total',String(c.n),eur(c.ca),eur(c.com)]],{boldLast:true});
+    pdfTable(p,104,[{t:'N°',x:40,w:30},{t:'Date',x:70,w:72},{t:'Réalisation',x:142,w:168},{t:'Taux',x:310,w:42,align:'right'},{t:'Qté',x:352,w:36,align:'right'},{t:'CA HT',x:388,w:82,align:'right'},{t:'Commission',x:470,w:85,align:'right'}],
+      [...c.M.sales.map((s2,i)=>{const rt=saleRate(s2,c.M);return [String(i+1),s2.d?frDate(s2.d):'',s2.label||'Enseigne néon',NFr.format(rt)+' %',String(s2.qty||1),eur(+s2.amount||0),eur((+s2.amount||0)*rt/100)]}),['','','Total','',String(c.n),eur(c.ca),eur(c.com)]],{boldLast:true});
     pdfFooter(p,sent?inv.number:'');
   }
   return {bytes:p.build(),name:`Facture-${sent&&inv.number?inv.number:'brouillon'}-${(clientInfo(LBN).legalName||'LBN').replace(/[^A-Za-z0-9]/g,'')}-${m}.pdf`};
@@ -457,7 +462,7 @@ function recapPDF(m){
   rows.push(['Total','',hTxt(c.h),eur(c.atelier),'']);
   y=pdfTable(p,y,[{t:'Jour',x:40,w:130},{t:'Horaires',x:170,w:150},{t:'Durée',x:320,w:65,align:'right'},{t:'Montant',x:385,w:75,align:'right'},{t:'Note',x:460,w:95}],rows,{boldLast:true});
   y+=24;if(y>720){p.add();y=50}p.text(40,y,'Ventes',{size:12,bold:true,color:GREEN});y+=10;
-  y=pdfTable(p,y,[{t:'N°',x:40,w:40},{t:'Date',x:80,w:80},{t:'Note',x:160,w:180},{t:'Qté',x:340,w:45,align:'right'},{t:'CA HT',x:385,w:85,align:'right'},{t:'Commission',x:470,w:85,align:'right'}],[...c.M.sales.map((s2,i)=>[String(i+1),s2.d?frDate(s2.d):'',s2.label||'',String(s2.qty||1),eur(+s2.amount||0),eur((+s2.amount||0)*c.r.rate/100)]),['','','Total',String(c.n),eur(c.ca),eur(c.com)]],{boldLast:true});
+  y=pdfTable(p,y,[{t:'N°',x:40,w:30},{t:'Date',x:70,w:72},{t:'Note',x:142,w:168},{t:'Taux',x:310,w:42,align:'right'},{t:'Qté',x:352,w:36,align:'right'},{t:'CA HT',x:388,w:82,align:'right'},{t:'Commission',x:470,w:85,align:'right'}],[...c.M.sales.map((s2,i)=>{const rt=saleRate(s2,c.M);return [String(i+1),s2.d?frDate(s2.d):'',s2.label||'',NFr.format(rt)+' %',String(s2.qty||1),eur(+s2.amount||0),eur((+s2.amount||0)*rt/100)]}),['','','Total','',String(c.n),eur(c.ca),eur(c.com)]],{boldLast:true});
   pdfFooter(p,'Interne');
   return {bytes:p.build(),name:`Recap-interne-${m}.pdf`};
 }
@@ -616,7 +621,7 @@ function pageAtelier(){
 function pageNeon(){
   const c=lbnCalc(UI.m),r=c.r,inv=S.invoices.find(i=>i.lbn===UI.m),rate=inv?+inv.tva||0:tvaRate(UI.m),cur=UI.m===mk();
   const ht=inv&&inv.sent?invHT(inv):c.total;
-  const parts=[{k:'Commission',d:`${NFx.format(r.rate)} % de ${eur(c.ca,0)}`,v:c.com,col:SERIES[0]},{k:'Atelier',d:`${hTxt(c.h)} × ${NFx.format(r.hourly)} €`,v:c.atelier,col:SERIES[1]},{k:'Avis',d:`${c.avisN} × ${NFx.format(r.avis)} €`,v:c.avis,col:SERIES[2]},{k:'Comm. additionnelle',d:'',v:c.bonus,col:SERIES[3]}].filter(p=>p.v>0||p.k==='Commission'||p.k==='Atelier');
+  const parts=[{k:'Commission',d:`${c.rates.length>1?c.rates.map(x=>NFr.format(x)).join(' / ')+' %':NFx.format(c.rates[0]??r.rate)+' %'} de ${eur(c.ca,0)}`,v:c.com,col:SERIES[0]},{k:'Atelier',d:`${hTxt(c.h)} × ${NFx.format(r.hourly)} €`,v:c.atelier,col:SERIES[1]},{k:'Avis',d:`${c.avisN} × ${NFx.format(r.avis)} €`,v:c.avis,col:SERIES[2]},{k:'Comm. additionnelle',d:'',v:c.bonus,col:SERIES[3]}].filter(p=>p.v>0||p.k==='Commission'||p.k==='Atelier');
   let pj=null;if(cur){const day=new Date().getDate(),dim=daysIn(UI.m);if(day<dim){const k=dim/day;pj={ca:c.ca*k,total:(c.com+c.atelier)*k+c.avis+c.bonus}}}
   const sales=c.M.sales.slice().reverse(),shown=UI.showSales?sales:sales.slice(0,8),maxS=sales.length?Math.max(...sales.map(s=>+s.amount||0)):0;
   const prev=lbnCalc(addM(UI.m,-1));
@@ -643,8 +648,9 @@ function pageNeon(){
     <div class="row"><span style="font-weight:650">⭐ Trustpilot</span><div class="stepper"><button data-act="avis" data-k="trust" data-v="-1" aria-label="Retirer">−</button><b>${+c.M.trust||0}</b><button data-act="avis" data-k="trust" data-v="1" aria-label="Ajouter">+</button></div></div>
     <div class="row" style="margin-top:10px"><span style="font-weight:650">🟢 Google</span><div class="stepper"><button data-act="avis" data-k="google" data-v="-1" aria-label="Retirer">−</button><b>${+c.M.google||0}</b><button data-act="avis" data-k="google" data-v="1" aria-label="Ajouter">+</button></div></div>
   </div>
+  ${promoBanner()}
   <div class="sec"><h2>Ventes</h2><span class="faint small">${c.M.sales.length}${maxS?' · max '+eur(maxS,0):''}</span></div>
-  <div class="card">${sales.length?shown.map(s=>`<div class="it" data-act="editSale" data-id="${s.id}"><div><div class="a">${eur(+s.amount||0)}${(s.qty||1)>1?` <span class="faint small">× ${s.qty} néons</span>`:''}</div>${(s.d||s.label)?`<div class="faint tiny">${[s.d?dayLabel(s.d):'',esc(s.label)].filter(Boolean).join(' · ')}</div>`:''}</div><div class="right"><div class="up" style="font-weight:650">+${eur((+s.amount||0)*r.rate/100)}</div><div class="faint tiny">commission</div></div></div>`).join('')+(sales.length>8?`<button class="more" data-act="toggleSales">${UI.showSales?'Réduire':`Voir les ${sales.length} ventes`}</button>`:''):'<div class="muted small">Aucune vente ce mois-ci.</div>'}</div>
+  <div class="card">${sales.length?shown.map(s=>`<div class="it" data-act="editSale" data-id="${s.id}"><div><div class="a">${eur(+s.amount||0)}${(s.qty||1)>1?` <span class="faint small">× ${s.qty} néons</span>`:''}</div>${(s.d||s.label)?`<div class="faint tiny">${[s.d?dayLabel(s.d):'',esc(s.label)].filter(Boolean).join(' · ')}</div>`:''}</div><div class="right"><div class="up" style="font-weight:650">+${eur((+s.amount||0)*saleRate(s,c.M)/100)}</div><div class="faint tiny">${saleRate(s,c.M)!==+r.rate?`<b style="color:var(--warn)">${NFr.format(saleRate(s,c.M))} %</b>`:'commission'}</div></div></div>`).join('')+(sales.length>8?`<button class="more" data-act="toggleSales">${UI.showSales?'Réduire':`Voir les ${sales.length} ventes`}</button>`:''):'<div class="muted small">Aucune vente ce mois-ci.</div>'}</div>
   ${c.M.companyCA>0?`<div class="card"><div class="row"><div><div class="label">Ta part des ventes LBN</div><div class="mid">${pct(c.ca/c.M.companyCA)}</div></div><div class="right muted small">${eur(c.ca,0)}<br>sur ${eur(c.M.companyCA,0)}</div></div></div>`:''}
   <div class="sec"><h2>Facturé à LBN</h2><span class="faint small">12 derniers mois</span></div>
   <div class="card"><div class="chart" id="lbnBars" style="margin-top:0"></div><div class="note" style="margin:8px 0 0">Pointillés = ta moyenne des mois terminés.</div></div>`;
@@ -809,7 +815,7 @@ const field=(label,name,val='',type='text',extra='',cls='')=>`<label class="fiel
 let toastT;function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('show'),2300)}
 function commit(msg){save();render();if(msg)toast(msg)}
 
-const BUILD='2026-11-16.1';
+const BUILD='2026-11-16.3';
 const SYNC={file:'ma-micro-donnees',valid:o=>!!o&&o.app==='ma-micro',
   colls:[['lbn',s=>s.lbn,'m',(s,a)=>{s.lbn=a}],['sessions',s=>s.sessions,'id',(s,a)=>{s.sessions=a}],['invoices',s=>s.invoices,'id',(s,a)=>{s.invoices=a}]],
   singles:[['profile',s=>s.profile],['settings',s=>s.settings,f=>f!=='lastSync'],['clients',s=>s.clients],['root',s=>s,f=>f==='timer']],
@@ -834,18 +840,18 @@ function syMerge(A,B){
   const sa=A._sync||{},sb=B._sync||{},fA=sa.f||{},fB=sb.f||{},J=JSON.stringify;
   const f={...fA};Object.entries(fB).forEach(([p,t])=>{if(t>(f[p]||0))f[p]=t});
   const del={...(sa.del||{})};Object.entries(sb.del||{}).forEach(([p,t])=>{if(t>(del[p]||0))del[p]=t});
-  const R=JSON.parse(J(A));let changes=0;
+  const R=JSON.parse(J(A));let changes=0;const fresh=SYNC.fresh?SYNC.fresh(A):SYNC.colls.every(([c,get])=>!(get(A)||[]).length),win=p=>(fB[p]||0)>(fA[p]||0)||(fresh&&(fB[p]||0)===(fA[p]||0));
   SYNC.colls.forEach(([c,get,key,set])=>{
     const a=get(A)||[],b=get(B)||[],ma=new Map(a.map(x=>[x[key],x])),mb=new Map(b.map(x=>[x[key],x]));
     const keys=[...a.map(x=>x[key]),...b.map(x=>x[key]).filter(k=>!ma.has(k))],out=[];
     keys.forEach(k=>{const x=ma.get(k),y=mb.get(k);let it;
-      if(x&&y){it=JSON.parse(J(x));new Set([...Object.keys(x),...Object.keys(y)]).forEach(fl=>{const p=`${c}|${k}|${fl}`;if(!(fl in y))return;if(!(fl in x)||(fB[p]||0)>(fA[p]||0)){if(J(it[fl])!==J(y[fl]))changes++;it[fl]=JSON.parse(J(y[fl]))}})}
+      if(x&&y){it=JSON.parse(J(x));new Set([...Object.keys(x),...Object.keys(y)]).forEach(fl=>{const p=`${c}|${k}|${fl}`;if(!(fl in y))return;if(!(fl in x)||win(p)){if(J(it[fl])!==J(y[fl]))changes++;it[fl]=JSON.parse(J(y[fl]))}})}
       else it=JSON.parse(J(x||y));
       const last=Math.max(0,...Object.keys(it).map(fl=>f[`${c}|${k}|${fl}`]||0)),dt=del[`${c}|${k}`]||0;
       if(dt&&dt>=last){if(x)changes++;return}
       if(!x)changes++;out.push(it)});
     set(R,out)});
-  SYNC.singles.forEach(([n,get,ok])=>{const a=get(A)||{},b=get(B)||{},r=get(R);if(!r)return;Object.keys(b).forEach(fl=>{if(ok&&!ok(fl))return;const p=`@${n}|${fl}`;if(!(fl in a)||(fB[p]||0)>(fA[p]||0)){if(J(r[fl])!==J(b[fl]))changes++;r[fl]=JSON.parse(J(b[fl]))}})});
+  SYNC.singles.forEach(([n,get,ok])=>{const a=get(A)||{},b=get(B)||{},r=get(R);if(!r)return;Object.keys(b).forEach(fl=>{if(ok&&!ok(fl))return;const p=`@${n}|${fl}`;if(!(fl in a)||win(p)){if(J(r[fl])!==J(b[fl]))changes++;r[fl]=JSON.parse(J(b[fl]))}})});
   R._sync={f,del};if(SYNC.post)SYNC.post(R,A,B);
   return {R,changes}}
 function syApply(o,mode){
@@ -945,11 +951,26 @@ function openSale(id){
     ${field('Montant HT vendu (€)','amount',s?nv(s.amount):'','text','num placeholder="0" autocomplete="off"','big-in')}
     <div class="f2">${field('Date','d',s?(s.d||''):defDate(),'date')}${field('Nombre de néons','qty',s?nv(s.qty||1):'1','text','num')}</div>
     ${field('Note','label',s?s.label:'','text','placeholder="ex : néon logo resto"')}
+    ${field('Commission sur cette vente (%)','srate',s&&s.rate!=null&&s.rate!==''?nv(s.rate):'','text','num placeholder="auto"')}
     <div id="saleHint" class="muted small" style="text-align:center;margin:-2px 0 12px"></div>
     <button class="btn" data-act="saveSale" data-id="${id||''}">${s?'Enregistrer':'Ajouter la vente'}</button>
     ${s?`<button class="btn danger" data-act="delSale" data-id="${id}" style="margin-top:10px">Supprimer</button>`:`<button class="btn ghost" data-act="saveSale" data-v="again" style="margin-top:10px">Ajouter et en saisir une autre</button>`}`,
-  w=>{const i=$('[name="amount"]',w),h=$('#saleHint',w);const up=()=>{const a=num(i.value);h.textContent=a>0?`→ ${eur(a*M.rules.rate/100)} de commission`:''};i.addEventListener('input',up);up();setTimeout(()=>i.focus(),320)});
+  w=>{const i=$('[name="amount"]',w),h=$('#saleHint',w),rI=$('[name="srate"]',w),dI=$('[name="d"]',w);
+    const up=()=>{const a=num(i.value),au=autoRate(dI.value,M),pr=promoOf(dI.value),own=rI.value.trim()!=='',rt=own?num(rI.value):au;rI.placeholder=`auto : ${NFr.format(au)} %${pr?' ('+(pr.label||'période spéciale')+')':''}`;
+      h.innerHTML=a>0?`→ <b>${eur(a*rt/100)}</b> de commission à ${NFr.format(rt)} %${!own&&pr?` · ${esc(pr.label||'période spéciale')}`:''}`:''};
+    [i,rI,dI].forEach(x=>x.addEventListener('input',up));dI.addEventListener('change',up);up();setTimeout(()=>i.focus(),320)});
 }
+function promoBanner(){const t=iso(),list=(S.settings.promos||[]).filter(p=>p.from&&(!p.to||p.to>=UI.m+'-01')&&p.from<=UI.m+'-31');
+  return `<div class="card" data-act="promos" style="padding:12px 16px;margin-bottom:12px">${list.length?list.map(p=>`<div class="row small"><span>🏷️ <b>${esc(p.label||'Période spéciale')}</b> · ${dayLabel(p.from)} → ${p.to?dayLabel(p.to):'en cours'}</span><b style="color:var(--warn)">${NFr.format(+p.rate)} %</b></div>`).join(''):`<div class="row small"><span class="muted">Commission différente sur certaines ventes (Black Friday, soldes…) ?</span><b style="color:var(--accent)">+ Période</b></div>`}</div>`}
+function promoRow(p,i){return `<div class="promo-row card" data-pr="${i}" style="padding:12px;margin-bottom:10px">${field('Nom','plabel',p.label||'','text','placeholder="ex : Black Friday"')}<div class="f2">${field('Du','pfrom',p.from||'','date')}${field('Au (inclus)','pto',p.to||'','date')}</div><div class="f2" style="align-items:end">${field('Commission (%)','prate',nv(p.rate??''),'text','num')}<button class="btn danger sm" data-act="delPromo" style="margin-bottom:12px">Supprimer</button></div></div>`}
+function openPromos(){
+  const list=(S.settings.promos||[]).length?S.settings.promos:[{label:'Black Friday',from:iso(),to:'',rate:13}];
+  openSheet('Périodes spéciales',`
+    <div class="muted small" style="margin:0 2px 12px">Les ventes datées dans une période prennent son taux tout seuls. Le reste du mois garde le taux normal (${NFr.format(+S.settings.lbnRules.rate)} %). Laisse « Au » vide si la fin n'est pas encore connue.</div>
+    <div id="promoRows">${list.map(promoRow).join('')}</div>
+    <button class="btn ghost sm" data-act="addPromo" style="margin-bottom:12px">+ Ajouter une période</button>
+    <button class="btn" data-act="savePromos">Enregistrer</button>
+    <div class="note">Tu peux aussi changer le taux d'une seule vente en l'ouvrant (« Commission sur cette vente »). Les factures déjà envoyées ne bougent pas.</div>`)}
 function openMonthInfo(){
   const M=lbnM(UI.m,true),r=M.rules;
   openSheet(`Infos de ${MONTHS_L[+UI.m.slice(5)-1]}`,`
@@ -1057,9 +1078,14 @@ const ACT={
   /* néon */
   newSale:()=>openSale(),editSale:id=>openSale(id),monthInfo:()=>openMonthInfo(),
   avis:(id,el)=>{const M=lbnM(UI.m,true),k=el.dataset.k;M[k]=Math.max(0,(+M[k]||0)+(+el.dataset.v));commit(+el.dataset.v>0?'Avis ajouté ⭐':null)},
-  saveSale:(id,el)=>{const a=num(fv$('amount'));if(a<=0)return toast('Indique un montant');const M=lbnM(UI.m,true);let s=id?M.sales.find(x=>x.id===id):null;if(!s){s={id:uid()};M.sales.push(s)}Object.assign(s,{amount:r2(a),qty:Math.max(1,Math.round(num(fv$('qty'))||1)),d:fv$('d'),label:fv$('label').trim()});save();render();
+  saveSale:(id,el)=>{const a=num(fv$('amount'));if(a<=0)return toast('Indique un montant');const M=lbnM(UI.m,true);let s=id?M.sales.find(x=>x.id===id):null;if(!s){s={id:uid()};M.sales.push(s)}const sr=fv$('srate').trim();s.rate=sr===''?null:num(sr);Object.assign(s,{amount:r2(a),qty:Math.max(1,Math.round(num(fv$('qty'))||1)),d:fv$('d'),label:fv$('label').trim()});save();render();
     if(el.dataset.v==='again'){openSale();toast(`Vente de ${eur(a,0)} ajoutée ✓`)}else{closeSheet();toast(id?'Vente modifiée':`Vente de ${eur(a,0)} ajoutée ✓`)}},
   delSale:id=>{if(!confirm('Supprimer cette vente ?'))return;const M=lbnM(UI.m,true);M.sales=M.sales.filter(x=>x.id!==id);closeSheet();commit('Vente supprimée')},
+  promos:()=>openPromos(),
+  addPromo:()=>{const b=$('#promoRows');b.insertAdjacentHTML('beforeend',promoRow({label:'',from:iso(),to:'',rate:''},b.children.length))},
+  delPromo:(_,el)=>el.closest('.promo-row').remove(),
+  savePromos:()=>{const out=[];let bad=false;$$('#promoRows .promo-row').forEach(r=>{const g=n=>$(`[name="${n}"]`,r).value.trim(),from=g('pfrom'),to=g('pto'),rate=g('prate');if(!from&&!rate)return;if(!from||rate===''||(to&&to<from)){bad=true;return}out.push({label:g('plabel'),from,to,rate:num(rate)})});
+    if(bad)return toast('Vérifie les dates et le taux');S.settings.promos=out.sort((a,b)=>a.from<b.from?-1:1);closeSheet();commit(out.length?'Période enregistrée ✓':'Périodes supprimées')},
   saveMonthInfo:()=>{const M=lbnM(UI.m,true),cc=fv$('companyCA').trim();M.bonus=num(fv$('bonus'));M.companyCA=cc?num(cc):null;M.hoursAdj=parseFloat(String(fv$('hoursAdj')).replace(',','.').replace('−','-'))||0;M.rules={rate:num(fv$('rate')),avis:num(fv$('avis')),hourly:num(fv$('hourly'))};closeSheet();commit('Mois mis à jour')},
   recapPdf:async(id,el)=>{const m=el.dataset.v||UI.m;try{await sharePDF(recapPDF(m))}catch(e){toast('Erreur PDF : '+e.message)}},
   lbnPdf:async(id,el)=>{const m=el.dataset.v||UI.m;try{await sharePDF(lbnPDF(m))}catch(e){toast('Erreur PDF : '+e.message)}},
