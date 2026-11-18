@@ -390,7 +390,7 @@ const ICON={
 
 function render(){
   mounts=[];const v=$('#view');
-  v.innerHTML=PAGES[UI.tab]();
+  v.innerHTML=(UI.tab==='home'?syRescue():'')+PAGES[UI.tab]();
   v.style.animation='none';void v.offsetWidth;v.style.animation='';
   $('#title').textContent=TITLES[UI.tab];
   $$('.tabbar button').forEach(b=>b.classList.toggle('on',b.dataset.tab===UI.tab));
@@ -651,8 +651,8 @@ const nv=v=>v==null||v===''?'':String(v).replace('.',',');
 let toastT;function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('show'),2200)}
 function commit(msg){save();render();if(msg)toast(msg)}
 
-const BUILD='2026-11-16.1';
-const SYNC={file:'patrimoine-donnees',valid:o=>!!o&&!!o.pea&&!!o.accounts,
+const BUILD='2026-11-18.1';
+const SYNC={file:'patrimoine-donnees',def:()=>seed(),fresh:A=>!((A.pea&&A.pea.lines)||[]).length&&!(A.accounts||[]).length&&!(A.moves||[]).length,valid:o=>!!o&&!!o.pea&&!!o.accounts,
   colls:[['lines',s=>s.pea&&s.pea.lines,'id',(s,a)=>{s.pea.lines=a}],['accounts',s=>s.accounts,'id',(s,a)=>{s.accounts=a}],['moves',s=>s.moves,'id',(s,a)=>{s.moves=a}],['snaps',s=>s.snaps,'m',(s,a)=>{s.snaps=a.sort((x,y)=>x.m<y.m?-1:1)}]],
   singles:[['profile',s=>s.profile],['settings',s=>s.settings,f=>f!=='lastSync'&&f!=='lastFetch'],['pea',s=>s.pea,f=>f!=='lines']],
   post(R,A,B){const H=o=>new Map(((o.pea&&o.pea.lines)||[]).map(l=>[l.id,l.history||[]])),ha=H(A),hb=H(B);
@@ -666,6 +666,9 @@ function syFlat(s){const v=new Map(),items=new Set(),J=JSON.stringify;
   SYNC.colls.forEach(([c,get,key])=>{(get(s)||[]).forEach(it=>{const k=it&&it[key];if(k==null)return;items.add(`${c}|${k}`);Object.keys(it).forEach(f=>v.set(`${c}|${k}|${f}`,J(it[f])))})});
   SYNC.singles.forEach(([n,get,ok])=>{const o=get(s)||{};Object.keys(o).forEach(f=>{if(ok&&!ok(f))return;v.set(`@${n}|${f}`,J(o[f]))})});
   return {v,items}}
+const syEmpty=()=>SYNC.fresh?SYNC.fresh(S):SYNC.colls.every(([c,get])=>!(get(S)||[]).length);
+function syRescue(){return FSA&&syEmpty()?`<div class="card" style="border-color:rgba(143,209,106,.5)"><div style="font-weight:700;margin-bottom:6px">Aucune donnée sur ce PC</div><div class="muted small" style="margin-bottom:12px">Récupère tout depuis ton fichier de synchro (iCloud Drive ou Google Drive → Mes apps).</div><button class="btn" data-act="sySync">Récupérer mes données</button></div>`:''}
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
 function syInit(){S._sync=S._sync||{};S._sync.f=S._sync.f||{};S._sync.del=S._sync.del||{};SY.prev=syFlat(S)}
 function syStamp(){if(!SY.prev)return;const cur=syFlat(S),now=Date.now(),st=S._sync;
   cur.v.forEach((x,p)=>{if(SY.prev.v.get(p)!==x)st.f[p]=now});
@@ -676,18 +679,18 @@ function syMerge(A,B){
   const sa=A._sync||{},sb=B._sync||{},fA=sa.f||{},fB=sb.f||{},J=JSON.stringify;
   const f={...fA};Object.entries(fB).forEach(([p,t])=>{if(t>(f[p]||0))f[p]=t});
   const del={...(sa.del||{})};Object.entries(sb.del||{}).forEach(([p,t])=>{if(t>(del[p]||0))del[p]=t});
-  const R=JSON.parse(J(A));let changes=0;
+  const R=JSON.parse(J(A));let changes=0;const D=SYNC.def?SYNC.def():null,emp=v=>v==null||v===''||(Array.isArray(v)&&!v.length)||(typeof v==='object'&&!Array.isArray(v)&&!Object.keys(v).length),isDef=(n,fl,v)=>{if(emp(v))return true;if(!D||!n)return false;const sg=SYNC.singles.find(x=>x[0]===n),o=sg?sg[1](D)||{}:{};return J(o[fl])===J(v)},tieFill=(p,n,fl,va,vb)=>(fB[p]||0)===(fA[p]||0)&&isDef(n,fl,va)&&!isDef(n,fl,vb);const fresh=SYNC.fresh?SYNC.fresh(A):SYNC.colls.every(([c,get])=>!(get(A)||[]).length),win=p=>(fB[p]||0)>(fA[p]||0)||(fresh&&(fB[p]||0)===(fA[p]||0));
   SYNC.colls.forEach(([c,get,key,set])=>{
     const a=get(A)||[],b=get(B)||[],ma=new Map(a.map(x=>[x[key],x])),mb=new Map(b.map(x=>[x[key],x]));
     const keys=[...a.map(x=>x[key]),...b.map(x=>x[key]).filter(k=>!ma.has(k))],out=[];
     keys.forEach(k=>{const x=ma.get(k),y=mb.get(k);let it;
-      if(x&&y){it=JSON.parse(J(x));new Set([...Object.keys(x),...Object.keys(y)]).forEach(fl=>{const p=`${c}|${k}|${fl}`;if(!(fl in y))return;if(!(fl in x)||(fB[p]||0)>(fA[p]||0)){if(J(it[fl])!==J(y[fl]))changes++;it[fl]=JSON.parse(J(y[fl]))}})}
+      if(x&&y){it=JSON.parse(J(x));new Set([...Object.keys(x),...Object.keys(y)]).forEach(fl=>{const p=`${c}|${k}|${fl}`;if(!(fl in y))return;if(!(fl in x)||win(p)||tieFill(p,null,fl,x[fl],y[fl])){if(J(it[fl])!==J(y[fl]))changes++;it[fl]=JSON.parse(J(y[fl]))}})}
       else it=JSON.parse(J(x||y));
       const last=Math.max(0,...Object.keys(it).map(fl=>f[`${c}|${k}|${fl}`]||0)),dt=del[`${c}|${k}`]||0;
       if(dt&&dt>=last){if(x)changes++;return}
       if(!x)changes++;out.push(it)});
     set(R,out)});
-  SYNC.singles.forEach(([n,get,ok])=>{const a=get(A)||{},b=get(B)||{},r=get(R);if(!r)return;Object.keys(b).forEach(fl=>{if(ok&&!ok(fl))return;const p=`@${n}|${fl}`;if(!(fl in a)||(fB[p]||0)>(fA[p]||0)){if(J(r[fl])!==J(b[fl]))changes++;r[fl]=JSON.parse(J(b[fl]))}})});
+  SYNC.singles.forEach(([n,get,ok])=>{const a=get(A)||{},b=get(B)||{},r=get(R);if(!r)return;Object.keys(b).forEach(fl=>{if(ok&&!ok(fl))return;const p=`@${n}|${fl}`;if(!(fl in a)||win(p)||tieFill(p,n,fl,a[fl],b[fl])){if(J(r[fl])!==J(b[fl]))changes++;r[fl]=JSON.parse(J(b[fl]))}})});
   R._sync={f,del};if(SYNC.post)SYNC.post(R,A,B);
   return {R,changes}}
 function syApply(o,mode){
@@ -932,7 +935,7 @@ const ACT={
   delSnap:(id,el)=>{S.snaps=S.snaps.filter(s=>s.m!==el.dataset.v);save();render();openSettings()},
   export:async()=>{const name=`patrimoine-${iso()}.json`,file=new File([JSON.stringify(S,null,1)],name,{type:'application/json'});try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'Sauvegarde Patrimoine'});return}}catch(e){if(e.name==='AbortError')return}const a=document.createElement('a');a.href=URL.createObjectURL(file);a.download=name;document.body.appendChild(a);a.click();a.remove()},
   import:()=>$('#importFile').click(),
-  reset:()=>{if(!confirm('Effacer toutes tes données ? (fais d’abord une sauvegarde)'))return;if(!confirm('Vraiment tout effacer ?'))return;S=seed();closeSheet();commit('Données effacées')}
+  reset:()=>{if(!confirm('Effacer toutes tes données ? (fais d’abord une sauvegarde)'))return;if(!confirm('Vraiment tout effacer ?'))return;S=seed();SY.prev=null;syInit();closeSheet();commit('Données effacées')}
 };
 Object.assign(ACT,SY_ACT,{update:()=>checkUpdate(true)});
 document.addEventListener('click',e=>{
