@@ -150,6 +150,9 @@ svg text{fill:var(--muted);font-size:10.5px;font-family:inherit}
 #toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));transform:translate(-50%,16px);background:#f2f2ef;color:#0a0a0b;font-weight:650;padding:10px 16px;border-radius:999px;opacity:0;transition:.25s;z-index:70;font-size:14px;pointer-events:none;max-width:88vw;text-align:center;white-space:nowrap}
 #toast.show{opacity:1;transform:translate(-50%,0)}
 
+.bbar{display:flex;gap:2px;height:14px;border-radius:7px;overflow:hidden;margin:10px 0 4px;background:var(--card2)}.bbar>div{height:100%}
+.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:999px;padding:8px 12px;font-size:14px;font-family:inherit;cursor:pointer}
+.mrow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}.mrow:first-child{border-top:0}
 /* ===== PC : barre latérale, contenu large, fenêtres centrées ===== */
 @media (min-width:900px){
   html.desk body{padding-left:228px}
@@ -182,6 +185,7 @@ svg text{fill:var(--muted);font-size:10.5px;font-family:inherit}
   <button data-tab="home"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Accueil</button>
   <button data-tab="pea"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 6-7"/></svg>PEA</button>
   <button data-tab="save"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="3"/><path d="M3 10h18"/><path d="M7 3h10"/></svg>Épargne</button>
+  <button data-tab="budget"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>Budget</button>
   <button data-tab="track"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>Suivi</button>
 </nav>
 <div id="sheet" class="sheet-wrap" hidden></div>
@@ -272,7 +276,7 @@ function seed(){
     return {v:1,created:t,
     profile:{goal:100000,goalDate:'2036-12-31',monthly:200,expenses:0},
     pea:{openDate:'',depositsBase:0,cash:0,lines:[]},
-    accounts:[],moves:[],snaps:[],settings:{}};
+    accounts:[],moves:[],snaps:[],settings:{},budget:{income:0,items:[]}};
 }
 let S;
 function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&o.pea&&o.accounts)return o}}catch(e){}return null}
@@ -289,7 +293,14 @@ const tsum=()=>S.pea.lines.reduce((a,l)=>a+(+l.target||0),0);
 const tw=l=>{const t=tsum();return t>0?(+l.target||0)/t:1/Math.max(1,S.pea.lines.length)};
 const accType=a=>TYPES[a.type]||TYPES.autre;
 const interestYear=()=>S.accounts.reduce((a,x)=>a+(+x.balance||0)*(+x.rate||0)/100,0);
-const safetyMonths=()=>S.profile.expenses>0?accTotal(a=>accType(a).group==='reg')/S.profile.expenses:0;
+const BCATS=[{k:'logement',l:'Logement',e:'🏠'},{k:'transport',l:'Transport',e:'🚗'},{k:'assurances',l:'Assurances',e:'🛡️'},{k:'abonnements',l:'Abonnements',e:'📱'},{k:'alimentation',l:'Alimentation',e:'🛒'},{k:'sante',l:'Santé',e:'💊'},{k:'loisirs',l:'Loisirs',e:'🎉'},{k:'autre',l:'Autre',e:'📦'}];
+const bcat=k=>BCATS.find(c=>c.k===k)||BCATS[7],bcolor=k=>SERIES[Math.max(0,BCATS.findIndex(c=>c.k===k))%SERIES.length];
+const FREQ={m:{l:'par mois',x:1},t:{l:'par trimestre',x:1/3},a:{l:'par an',x:1/12},s:{l:'par semaine',x:52/12}};
+const bItems=()=>((S.budget&&S.budget.items)||[]).filter(i=>i.on!==false);
+const bMonthly=i=>(+i.amount||0)*(FREQ[i.freq]||FREQ.m).x;
+const budgetTotal=()=>bItems().reduce((a,i)=>a+bMonthly(i),0);
+const monthlyExpenses=()=>budgetTotal()>0?budgetTotal():(+S.profile.expenses||0);
+const safetyMonths=()=>monthlyExpenses()>0?accTotal(a=>accType(a).group==='reg')/monthlyExpenses():0;
 const monthIn=(m=mk())=>S.moves.filter(x=>x.amount>0&&x.d.slice(0,7)===m).reduce((a,x)=>a+x.amount,0);
 const peaAgeMonths=()=>{if(!S.pea.openDate)return -1;return Math.max(0,monthsBetween(new Date(S.pea.openDate),new Date()))};
 const goalProg=()=>S.profile.goal>0?Math.min(1,total()/S.profile.goal):0;
@@ -378,7 +389,7 @@ function spark(vals,color){if(vals.length<2)return '<div class="spark-empty">La 
 /* ---------- interface ---------- */
 const UI={tab:'home',range:'1A',horizon:20,projMonthly:null,rbAmount:null,donutSel:null,plan:null};
 let mounts=[];const mount=f=>mounts.push(f);
-const TITLES={home:'Accueil',pea:'Mon PEA',save:'Épargne',track:'Suivi'};
+const TITLES={home:'Accueil',pea:'Mon PEA',save:'Épargne',budget:'Budget',track:'Suivi'};
 const seg=(k,opts,cur)=>`<div class="seg">${opts.map(o=>`<button data-act="seg" data-k="${k}" data-v="${o}" class="${String(o)===String(cur)?'on':''}">${o}${k==='horizon'?' ans':''}</button>`).join('')}</div>`;
 const status=(gap)=>{const a=Math.abs(gap);if(a<=0.015)return `<span class="status"><i style="background:var(--good)"></i>Dans la cible</span>`;return `<span class="status"><i style="background:var(--serious)"></i>${gap>0?'↑ Trop':'↓ Manque'} ${pts(gap)}</span>`};
 const ICON={
@@ -412,7 +423,7 @@ function insights(){
   const m=monthIn();
   out.push(m>0?{e:'🔥',t:`Déjà <b>${eur(m,0)}</b> versés en ${MONTHS_L[new Date().getMonth()]}. Continue comme ça.`}:{e:'🔥',t:`Aucun versement enregistré ce mois-ci : même 50 € gardent ta série en vie.`});
   const it=interestYear();if(it>0)out.push({e:'🪙',t:`Tes comptes rémunérés rapportent environ <b>${eur(it,0)} par an</b>.`});
-  const sm=safetyMonths();if(S.profile.expenses>0&&sm<3)out.push({e:'🛡️',t:`Ton épargne de sécurité couvre <b>${NF1.format(sm)} mois</b> de dépenses. Vise 3 à 6 mois.`});
+  const sm=safetyMonths();if(monthlyExpenses()>0&&sm<3)out.push({e:'🛡️',t:`Ton épargne de sécurité couvre <b>${NF1.format(sm)} mois</b> de dépenses. Vise 3 à 6 mois.`});
   const full=S.accounts.find(a=>a.ceiling>0&&a.balance>=a.ceiling);if(full)out.push({e:'✅',t:`Ton <b>${esc(full.name)}</b> est plein : tes prochains versements seront plus utiles ailleurs.`});
   return out.slice(0,4);
 }
@@ -467,20 +478,20 @@ function drawHistory(){
   if(p.length<2){el.innerHTML=`<div class="empty-chart"><svg width="120" height="40" viewBox="0 0 120 40"><path d="M2 34 L30 28 L52 30 L74 18 L96 20 L118 6" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="4 5" stroke-linecap="round"/><circle cx="118" cy="6" r="4" fill="var(--accent)"/></svg>Ta courbe se dessine mois après mois.<br>Fais ton <b style="color:var(--text)">bilan du mois</b> chaque mois, ou ajoute tes mois passés dans les réglages.</div>`;return}
   lineChart(el,p.map(x=>mLabel(x.m)),[{name:'Patrimoine',color:'#8fd16a',values:p.map(x=>x.y),area:true}],{endDot:true,aria:'Évolution du patrimoine',tip:i=>`${mLabel(p[i].m)}<br><b>${eur(p[i].y)}</b>`});
 }
-function drawDonut(){
-  const el=$('#donut');if(!el)return;
-  const items=entities(),T=items.reduce((a,e)=>a+e.value,0),S0=176,c=S0/2,R1=86,R0=64;
-  const dc=$('#dc'),lg=$('#legend');
+function drawDonut(o={}){
+  const el=$(o.el||'#donut');if(!el)return;const K=o.key||'donutSel',unit=o.unit||'poste';
+  const items=o.items||entities(),T=items.reduce((a,e)=>a+e.value,0),S0=176,c=S0/2,R1=86,R0=64;
+  const dc=$(o.dc||'#dc'),lg=$(o.lg||'#legend');
   if(!T){el.innerHTML=`<svg width="${S0}" height="${S0}"><circle cx="${c}" cy="${c}" r="${(R0+R1)/2}" fill="none" stroke="var(--card2)" stroke-width="${R1-R0}"/></svg>`;dc.innerHTML=`<div class="a">Rien pour l’instant</div>`;lg.innerHTML='';return}
   let a=-Math.PI/2,body='';const gap=items.length>1?2.2/R1:0;
   items.forEach((e,i)=>{const sw=e.value/T*2*Math.PI;if(items.length===1)body+=`<circle data-i="${i}" class="seg-d" cx="${c}" cy="${c}" r="${(R0+R1)/2}" fill="none" stroke="${e.color}" stroke-width="${R1-R0}"/>`;else{const a0=a+gap/2,a1=a+sw-gap/2;if(a1>a0)body+=`<path data-i="${i}" class="seg-d" d="${arcPath(c,c,R0,R1,a0,a1)}" fill="${e.color}"/>`}a+=sw});
   el.innerHTML=`<svg width="${S0}" height="${S0}" viewBox="0 0 ${S0} ${S0}" role="img" aria-label="Répartition du patrimoine">${body}</svg>`;
-  const setC=i=>{if(i==null){dc.innerHTML=`<div class="a">Total</div><div class="b">${eur(T,0)}</div><div class="c">${items.length} poste${items.length>1?'s':''}</div>`}else{const e=items[i];dc.innerHTML=`<div class="a">${esc(e.name)}</div><div class="b">${eur(e.value,0)}</div><div class="c">${pct(e.value/T)}</div>`}$$('.seg-d',el).forEach(p=>p.style.opacity=i==null||+p.dataset.i===i?1:.3);$$('.lg',lg).forEach(r=>r.style.opacity=i==null||+r.dataset.i===i?1:.45)};
+  const setC=i=>{if(i==null){dc.innerHTML=`<div class="a">${o.total||'Total'}</div><div class="b">${eur(T,0)}</div><div class="c">${items.length} ${unit}${items.length>1?'s':''}</div>`}else{const e=items[i];dc.innerHTML=`<div class="a">${esc(e.name)}</div><div class="b">${eur(e.value,0)}</div><div class="c">${pct(e.value/T)}</div>`}$$('.seg-d',el).forEach(p=>p.style.opacity=i==null||+p.dataset.i===i?1:.3);$$('.lg',lg).forEach(r=>r.style.opacity=i==null||+r.dataset.i===i?1:.45)};
   lg.innerHTML=items.map((e,i)=>`<div class="lg" data-i="${i}"><span class="sw" style="background:${e.color};margin:0"></span><span>${esc(e.name)}</span><span class="p">${pct(e.value/T)}</span><span class="vv">${eur(e.value,0)}</span></div>`).join('');
-  const toggle=i=>{UI.donutSel=UI.donutSel===i?null:i;setC(UI.donutSel)};
+  const toggle=i=>{UI[K]=UI[K]===i?null:i;setC(UI[K])};
   $$('.seg-d',el).forEach(p=>p.addEventListener('click',()=>toggle(+p.dataset.i)));
   $$('.lg',lg).forEach(r=>r.addEventListener('click',()=>toggle(+r.dataset.i)));
-  if(UI.donutSel!=null&&UI.donutSel>=items.length)UI.donutSel=null;setC(UI.donutSel);
+  if(UI[K]!=null&&UI[K]>=items.length)UI[K]=null;setC(UI[K]);
 }
 
 /* ===== PEA ===== */
@@ -546,7 +557,7 @@ function drawRebalance(){
 
 /* ===== ÉPARGNE ===== */
 function pageSave(){
-  const A=accTotal(),it=interestYear(),avg=A?it/A:0,sm=safetyMonths(),exp=S.profile.expenses||0;
+  const A=accTotal(),it=interestYear(),avg=A?it/A:0,sm=safetyMonths(),exp=monthlyExpenses();
   const by=g=>S.accounts.filter(a=>accType(a).group===g);
   const card=a=>{const c=entityColor(a.id),b=+a.balance||0,i=b*(+a.rate||0)/100,cp=a.ceiling>0?b/a.ceiling:0;
     return `<div class="card" data-act="editAcc" data-id="${a.id}">
@@ -572,6 +583,64 @@ function pageSave(){
   <button class="btn ghost" data-act="newAcc" style="margin-top:12px">+ Ajouter un compte</button>
   <div class="note">Taux réglementés au 15/11/2026 : Livret A et LDDS 1,7 %, LEP 2,5 %, CEL 1,25 %, PEL ouvert en 2026 2 %. Prochaine révision le 1<sup>er</sup> février 2027 : pense à mettre tes taux à jour.</div>`;
 }
+
+
+/* ===== BUDGET ===== */
+const BTPL=[['Loyer','logement',650,'m',0,5],['Électricité','logement',60,'m',0,10],['Internet','abonnements',30,'m',0,8],['Forfait mobile','abonnements',15,'m',0,8],['Assurance auto','assurances',50,'m',0,5],['Assurance habitation','assurances',12,'m',0,5],['Mutuelle','sante',40,'m',0,5],['Essence','transport',120,'m',1,''],['Courses','alimentation',300,'m',1,''],['Netflix','abonnements',13.49,'m',0,''],['Spotify','abonnements',11.12,'m',0,''],['Salle de sport','loisirs',30,'m',0,''],['Amazon Prime','abonnements',69.9,'a',0,''],['Restaurants / sorties','loisirs',100,'m',1,'']];
+const ordinal=n=>n===1?'1er':String(n);
+function pageBudget(){
+  const it=bItems(),T=budgetTotal(),inc=+((S.budget||{}).income)||0,sv=+S.profile.monthly||0,rest=inc-T-sv;
+  const est=it.filter(i=>i.est).reduce((a,i)=>a+bMonthly(i),0);
+  const cats=BCATS.map(c=>({...c,v:it.filter(i=>(i.cat||'autre')===c.k).reduce((a,i)=>a+bMonthly(i),0)})).filter(c=>c.v>0).sort((a,b)=>b.v-a.v);
+  const ab=it.filter(i=>i.cat==='abonnements'),abY=ab.reduce((a,i)=>a+bMonthly(i),0)*12;
+  const today=new Date().getDate(),dim=new Date(new Date().getFullYear(),new Date().getMonth()+1,0).getDate();
+  const up=it.filter(i=>i.freq==='m'&&+i.day>=today).sort((a,b)=>a.day-b.day),upT=up.reduce((a,i)=>a+(+i.amount||0),0);
+  if(cats.length)mount(()=>drawDonut({el:'#bdonut',dc:'#bdc',lg:'#blegend',key:'bSel',unit:'catégorie',total:'Par mois',items:cats.map(c=>({name:c.e+' '+c.l,value:c.v,color:bcolor(c.k)}))}));
+  const bar=inc>0?(()=>{const W=Math.max(inc,T+sv),seg=(v,c,l)=>v>0?`<div title="${l}" style="width:${v/W*100}%;background:${c}"></div>`:'';
+    return `<div class="bbar">${seg(T,SERIES[1],'Dépenses')}${seg(sv,SERIES[0],'Épargne')}${seg(Math.max(0,rest),'var(--accent)','Reste')}</div>
+    <div class="split"><span><span class="sw" style="background:${SERIES[1]}"></span>Dépenses<b>${eur(T,0)}</b></span><span><span class="sw" style="background:${SERIES[0]}"></span>Épargne<b>${eur(sv,0)}</b></span><span><span class="sw" style="background:var(--accent)"></span>Reste<b>${eur(rest,0)}</b></span></div>`})():'';
+  const row=i=>{const c=bcat(i.cat),m=bMonthly(i);return `<div class="mrow" data-act="editB" data-id="${i.id}"><div class="row" style="gap:12px;justify-content:flex-start;min-width:0"><div class="av" style="background:${bcolor(c.k)}26">${c.e}</div><div style="min-width:0"><div class="name">${esc(i.label)}</div><div class="muted tiny">${i.est?'≈ estimé · ':''}${i.freq!=='m'?`${eur(+i.amount||0)} ${FREQ[i.freq].l}`:(i.day?`le ${ordinal(+i.day)} du mois`:'chaque mois')}</div></div></div><div class="right"><div class="lv">${i.est?'≈ ':''}${eur(m,m<100?2:0)}</div><div class="faint tiny">/ mois</div></div></div>`};
+  const tips=[];
+  if(cats.length){const top=cats[0];tips.push(`${top.e} <b>${top.l}</b> est ton 1er poste : ${pct(top.v/T,0)} de tes dépenses.`)}
+  if(abY>0)tips.push(`📱 Tes abonnements te coûtent <b>${eur(abY,0)} par an</b>. Faire le tri une fois par an peut valoir le coup.`);
+  if(inc>0){const r=sv/inc;tips.push(r>=.2?`🌱 Tu épargnes <b>${pct(r,0)}</b> de ton revenu : c'est très bien (repère : 10 à 20 %).`:`🌱 Tu épargnes <b>${pct(r,0)}</b> de ton revenu. Repère courant : 10 à 20 %.`);if(rest<0)tips.push(`⚠️ Tes dépenses + ton épargne prévue dépassent ton revenu de <b>${eur(-rest,0)}</b> par mois.`)}
+  if(T>0&&safetyMonths()<3)tips.push(`🛡️ Avec ${eur(T,0)}/mois de dépenses, ton épargne de sécurité idéale est de <b>${eur(T*3,0)} à ${eur(T*6,0)}</b>.`);
+  return `
+  <div class="card">
+    <div class="row"><span class="label">Tes dépenses par mois</span><span class="faint tiny" data-act="budgetSettings" style="cursor:pointer">${inc>0?'Revenu '+eur(inc,0):'+ Revenu'}</span></div>
+    <div class="big">${eur(T)}</div>
+    <div><span class="pill">${eur(T*12,0)} par an</span> <span class="pill">${eur(T/30.4,0)} par jour</span>${est>0?` <span class="pill">dont ≈ ${eur(est,0)} estimés</span>`:''}</div>
+    ${inc>0?`<div class="label" style="margin-top:18px">Sur ton revenu de ${eur(inc,0)}</div>${bar}`:`<div class="muted small" style="margin-top:14px" data-act="budgetSettings">Ajoute ton <b style="color:var(--text)">revenu net mensuel</b> pour voir ton reste à vivre et ton taux d'épargne →</div>`}
+  </div>
+  ${it.length?`
+  <div class="card"><div class="label">Par catégorie</div>
+    <div class="donut-wrap"><div id="bdonut"></div><div class="dc" id="bdc"></div></div><div class="legend" id="blegend"></div></div>
+  ${up.length?`<div class="sec"><h2>Encore à prélever ce mois</h2><span class="faint small">${eur(upT,0)}</span></div><div class="card" style="padding:6px 16px">${up.map(i=>`<div class="row small" style="padding:9px 0;border-top:1px solid var(--line)"><span><b>${ordinal(+i.day)}</b> <span class="muted">·</span> ${esc(i.label)}</span><b>${eur(+i.amount||0)}</b></div>`).join('').replace('border-top:1px solid var(--line)','')}</div>`:''}
+  ${tips.length?`<div class="sec"><h2>À retenir</h2></div><div class="card">${tips.map(t=>`<div class="small" style="padding:6px 0">${t}</div>`).join('')}</div>`:''}
+  ${BCATS.map(c=>{const l=it.filter(i=>(i.cat||'autre')===c.k);if(!l.length)return '';return `<div class="sec"><h2>${c.e} ${c.l}</h2><span class="faint small">${eur(l.reduce((a,i)=>a+bMonthly(i),0),0)}/mois</span></div><div class="card" style="padding:4px 16px">${l.sort((a,b)=>bMonthly(b)-bMonthly(a)).map(row).join('')}</div>`}).join('')}
+  `:`<div class="cta" data-act="newB">Aucune dépense pour l'instant.<br><b>Ajoute ton loyer, tes abonnements, ton essence…</b></div>`}
+  <button class="btn" data-act="newB" style="margin-top:12px">+ Ajouter une dépense</button>
+  <div class="sh-sub" style="margin-top:18px">Ajout rapide</div>
+  <div class="chips">${BTPL.filter(t=>!it.some(i=>i.label===t[0])).map((t,k)=>`<button class="chip" data-act="tplB" data-id="${BTPL.indexOf(t)}">${bcat(t[1]).e} ${t[0]}</button>`).join('')}</div>
+  <div class="note">Ton total de dépenses sert aussi au calcul de ton épargne de sécurité (onglet Épargne). Pour les dépenses variables comme l'essence ou les courses, mets une moyenne et coche « estimé ».</div>`;
+}
+function openBudget(id,tpl){
+  const i=id?S.budget.items.find(x=>x.id===id):null,t=tpl?{label:tpl[0],cat:tpl[1],amount:tpl[2],freq:tpl[3],est:!!tpl[4],day:tpl[5]}:null,v=i||t||{label:'',cat:'abonnements',amount:'',freq:'m',est:false,day:''};
+  openSheet(i?esc(i.label):'Nouvelle dépense',`
+    ${field('Nom','blabel',v.label,'text','placeholder="ex : Loyer, Netflix, Essence…"')}
+    <div class="f2">${field('Montant (€)','bamount',v.amount===''?'':nv(v.amount),'text','num placeholder="0,00"')}<label class="field"><span>Fréquence</span><select name="bfreq">${Object.entries(FREQ).map(([k,f])=>`<option value="${k}" ${k===v.freq?'selected':''}>${f.l[0].toUpperCase()+f.l.slice(1)}</option>`).join('')}</select></label></div>
+    <div class="f2"><label class="field"><span>Catégorie</span><select name="bcat">${BCATS.map(c=>`<option value="${c.k}" ${c.k===v.cat?'selected':''}>${c.e} ${c.l}</option>`).join('')}</select></label>${field('Jour de prélèvement','bday',v.day||'','text','num placeholder="ex : 5"')}</div>
+    <label class="row" style="padding:6px 2px 14px;cursor:pointer"><span>Montant estimé (dépense variable)</span><input type="checkbox" name="best" ${v.est?'checked':''} style="width:22px;height:22px;accent-color:var(--accent)"></label>
+    <div class="muted small" id="bHint" style="margin:-4px 2px 14px"></div>
+    <button class="btn" data-act="saveB" data-id="${id||''}">Enregistrer</button>
+    ${i?`<div class="hr"></div><button class="btn danger" data-act="delB" data-id="${id}">Supprimer</button>`:''}`,
+  w=>{const a=$('[name="bamount"]',w),f=$('[name="bfreq"]',w),h=$('#bHint',w);const up=()=>{const m=num(a.value)*(FREQ[f.value]||FREQ.m).x;h.textContent=num(a.value)>0&&f.value!=='m'?`→ soit ${eur(m)} par mois`:''};a.addEventListener('input',up);f.addEventListener('change',up);up();if(!i)setTimeout(()=>(t?a:$('[name="blabel"]',w)).focus(),320)});
+}
+function openBudgetSettings(){
+  openSheet('Revenu',`
+    ${field('Revenu net mensuel (€)','binc',nv((S.budget||{}).income||''),'text','num placeholder="ce qui arrive sur ton compte"')}
+    <div class="muted small" style="margin:-4px 2px 14px">Pour ta micro : ton net après URSSAF (il est en gros dans Ma Micro). L'épargne prévue (${eur(+S.profile.monthly||0,0)}/mois) se règle dans les Réglages.</div>
+    <button class="btn" data-act="saveBudgetSettings">Enregistrer</button>`)}
 
 /* ===== SUIVI ===== */
 const BADGES=[
@@ -635,7 +704,7 @@ function drawProjection(){
   lineChart($('#projChart'),yrs.map(y=>y?`+${y} a`:'auj.'),series,{h:200,pr:70,direct:true,endDot:true,xticks:3,aria:'Projection du PEA',tip:i=>`<div>Dans ${i} an${i>1?'s':''}</div>${series.map(s=>`<div class="k"><span class="sw" style="background:${s.color};margin:0"></span>${s.name} <b style="margin-left:auto;padding-left:10px">${eur(s.values[i],0)}</b></div>`).join('')}`});
 }
 
-const PAGES={home:pageHome,pea:pagePEA,save:pageSave,track:pageTrack};
+const PAGES={home:pageHome,pea:pagePEA,save:pageSave,budget:pageBudget,track:pageTrack};
 
 /* ---------- feuilles (modales) ---------- */
 function openSheet(title,html,onMount){
@@ -651,13 +720,13 @@ const nv=v=>v==null||v===''?'':String(v).replace('.',',');
 let toastT;function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('show'),2200)}
 function commit(msg){save();render();if(msg)toast(msg)}
 
-const BUILD='2026-11-18.1';
+const BUILD='2026-11-23.1';
 const SYNC={file:'patrimoine-donnees',def:()=>seed(),fresh:A=>!((A.pea&&A.pea.lines)||[]).length&&!(A.accounts||[]).length&&!(A.moves||[]).length,valid:o=>!!o&&!!o.pea&&!!o.accounts,
-  colls:[['lines',s=>s.pea&&s.pea.lines,'id',(s,a)=>{s.pea.lines=a}],['accounts',s=>s.accounts,'id',(s,a)=>{s.accounts=a}],['moves',s=>s.moves,'id',(s,a)=>{s.moves=a}],['snaps',s=>s.snaps,'m',(s,a)=>{s.snaps=a.sort((x,y)=>x.m<y.m?-1:1)}]],
-  singles:[['profile',s=>s.profile],['settings',s=>s.settings,f=>f!=='lastSync'&&f!=='lastFetch'],['pea',s=>s.pea,f=>f!=='lines']],
+  colls:[['budget',s=>s.budget&&s.budget.items,'id',(s,a)=>{s.budget=s.budget||{income:0};s.budget.items=a}],['lines',s=>s.pea&&s.pea.lines,'id',(s,a)=>{s.pea.lines=a}],['accounts',s=>s.accounts,'id',(s,a)=>{s.accounts=a}],['moves',s=>s.moves,'id',(s,a)=>{s.moves=a}],['snaps',s=>s.snaps,'m',(s,a)=>{s.snaps=a.sort((x,y)=>x.m<y.m?-1:1)}]],
+  singles:[['profile',s=>s.profile],['budgetP',s=>s.budget,f=>f!=='items'],['settings',s=>s.settings,f=>f!=='lastSync'&&f!=='lastFetch'],['pea',s=>s.pea,f=>f!=='lines']],
   post(R,A,B){const H=o=>new Map(((o.pea&&o.pea.lines)||[]).map(l=>[l.id,l.history||[]])),ha=H(A),hb=H(B);
     R.pea.lines.forEach(l=>{const m=new Map();[...(ha.get(l.id)||[]),...(hb.get(l.id)||[]),...(l.history||[])].forEach(h=>m.set(h.d,h));l.history=[...m.values()].sort((a,b)=>a.d<b.d?-1:1).slice(-150)})},
-  after(){S.moves=S.moves||[];S.snaps=S.snaps||[];S.settings=S.settings||{};S.pea.lines=S.pea.lines||[]}};
+  after(){S.budget=S.budget||{income:0,items:[]};S.budget.items=S.budget.items||[];S.moves=S.moves||[];S.snaps=S.snaps||[];S.settings=S.settings||{};S.pea.lines=S.pea.lines||[]}};
 /* ============ synchro iPhone ⇄ PC (fusion intelligente) ============ */
 const DESK=matchMedia('(hover:hover) and (pointer:fine)').matches;
 const FSA=DESK&&'showOpenFilePicker' in window;
@@ -883,6 +952,13 @@ const ACT={
   newMove:()=>openMove(),
   newLine:()=>openLine(),
   editLine:id=>openLine(id),
+  newB:()=>openBudget(),editB:id=>openBudget(id),tplB:id=>openBudget(null,BTPL[+id]),budgetSettings:()=>openBudgetSettings(),
+  saveB:id=>{const label=fv$('blabel').trim(),amt=num(fv$('bamount'));if(!label)return toast('Donne un nom');if(amt<=0)return toast('Indique un montant');
+    let i=id?S.budget.items.find(x=>x.id===id):null;if(!i){i={id:uid()};S.budget.items.push(i)}
+    const d=Math.round(num(fv$('bday')));Object.assign(i,{label,amount:r2(amt),freq:fv$('bfreq'),cat:fv$('bcat'),day:d>=1&&d<=31?d:'',est:$('#sheet [name="best"]').checked,on:true});
+    closeSheet();commit(id?'Dépense modifiée':`${label} ajouté ✓`)},
+  delB:id=>{if(!confirm('Supprimer cette dépense ?'))return;S.budget.items=S.budget.items.filter(x=>x.id!==id);closeSheet();commit('Dépense supprimée')},
+  saveBudgetSettings:()=>{S.budget.income=r2(num(fv$('binc')));closeSheet();commit('Revenu enregistré')},
   newAcc:()=>openAcc(),
   editAcc:id=>openAcc(id),
   peaSettings:()=>openPeaSettings(),
@@ -949,7 +1025,7 @@ $('#importFile').addEventListener('change',e=>{const f=e.target.files[0];if(f)sy
 /* ---------- démarrage ---------- */
 (function init(){
   S=load();if(!S){S=seed()}else{S.moves=S.moves||[];S.snaps=S.snaps||[]}
-  S.settings=S.settings||{};syInit();save();
+  S.settings=S.settings||{};S.budget=S.budget||{income:0,items:[]};S.budget.items=S.budget.items||[];syInit();save();
   const d=new Date();const hs=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});$('#hello').textContent=hs.charAt(0).toUpperCase()+hs.slice(1);
   try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
   render();checkUpdate();
